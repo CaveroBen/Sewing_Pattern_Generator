@@ -21,9 +21,9 @@ setup(
     install_requires=[
         "matplotlib>=3.5.0",
         "numpy>=1.21.0",
-        "scipy>=1.7.0",
-        "Pillow>=9.0.0",
-        "reportlab>=3.6.0",
+        "scipy>=1.8.0",
+        "Pillow>=10.2.0",
+        "reportlab>=3.6.13",
     ],
     entry_points={
         "console_scripts": [
