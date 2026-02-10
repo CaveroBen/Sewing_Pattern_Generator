@@ -115,7 +115,7 @@ def generate_trousers(pname="M44D", gender='m', style='Donnanno', darts=True, ou
     print(f"  Darts: {darts}")
     
     # Create the trousers pattern
-    pans = OP.Basic_Trousers(
+    trousers = OP.Basic_Trousers(
         pname=pname,
         gender=gender,
         style=style,
@@ -125,7 +125,7 @@ def generate_trousers(pname="M44D", gender='m', style='Donnanno', darts=True, ou
     )
     
     # Draw the pattern
-    pans.draw_basic_trousers(
+    trousers.draw_basic_trousers(
         dic={"Pattern": "Basic trousers with dart"}, 
         save=True
     )

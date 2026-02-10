@@ -12,7 +12,7 @@ import matplotlib.pyplot as plt
 import OpenPattern as OP
 
 # Create a men's trousers pattern using Donnanno method
-pans = OP.Basic_Trousers(
+trousers = OP.Basic_Trousers(
     pname="M44D",       # Pattern name (M=Men, 44=size, D=Donnanno)
     gender="m",         # 'm' for men, 'w' for women
     style="Donnanno",   # Pattern drafting style
@@ -22,7 +22,7 @@ pans = OP.Basic_Trousers(
 )
 
 # Draw the trousers pattern with custom dictionary
-pans.draw_basic_trousers(
+trousers.draw_basic_trousers(
     dic={"Pattern": "Basic trousers with dart"}, 
     save=True
 )
