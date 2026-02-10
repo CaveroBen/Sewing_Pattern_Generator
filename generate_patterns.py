@@ -65,7 +65,8 @@ def generate_skirt(pname="W6C", gender='G', style='Chiappetta', ease=8, curves=F
     
     Args:
         pname: Pattern name (e.g., W6C = Women's size, Chiappetta style)
-        gender: Gender code (use 'G' for general/women)
+        gender: Gender code - Note: OpenPattern's Basic_Skirt requires 'G' (not 'w' or 'm')
+               This is an OpenPattern API requirement, not a standard gender code
         style: Pattern drafting style (e.g., 'Chiappetta')
         ease: Ease in cm
         curves: Whether to use curves
@@ -77,10 +78,11 @@ def generate_skirt(pname="W6C", gender='G', style='Chiappetta', ease=8, curves=F
     print(f"  Ease: {ease} cm")
     
     # Create the skirt pattern
+    # Note: OpenPattern's Basic_Skirt uses different parameters than Basic_Bodice/Basic_Trousers
     p = OP.Basic_Skirt(
         pname=pname,
         style=style,
-        gender=gender,
+        gender=gender,  # OpenPattern requires 'G' for skirts
         ease=ease,
         curves=curves
     )
