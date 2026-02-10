@@ -7,7 +7,13 @@ Pillow>=10.2.0
 # PDF generation
 reportlab>=3.6.13
 
-# Note: OpenPattern installation instructions:
+# Optional: OpenPattern for formal pattern drafting
+# OpenPattern provides professional-grade pattern generation based on
+# established patternmaking methodologies. Installation instructions:
+#
 # git clone https://github.com/fmetivier/OpenPattern.git
 # cd OpenPattern
 # python setup.py install
+#
+# Note: The basic pattern generator works without OpenPattern.
+# OpenPattern is recommended for professional tailoring applications.

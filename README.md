@@ -34,6 +34,32 @@ pip install -e .
 
 This will install the `generate-pattern` command globally.
 
+### Optional: Install OpenPattern (Recommended)
+
+For formal pattern drafting using established patternmaking methodologies, you can install the OpenPattern library:
+
+```bash
+# Clone the OpenPattern repository
+git clone https://github.com/fmetivier/OpenPattern.git
+
+# Navigate to the OpenPattern directory
+cd OpenPattern
+
+# Install OpenPattern
+python setup.py install
+```
+
+**What is OpenPattern?**
+
+OpenPattern is a Python library for generating professional sewing patterns based on established patternmaking techniques by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnano. It provides:
+
+- More sophisticated pattern blocks with professional-grade accuracy
+- Support for standard sizing systems (French, Italian)
+- Advanced features like dart manipulation and pattern grading
+- Scriptable pattern customization
+
+**Note:** OpenPattern is optional. The basic pattern generator works without it, but OpenPattern provides more professional results for serious sewers and tailors.
+
 ## Usage
 
 ### Basic Usage
@@ -214,11 +240,39 @@ generate-pattern trousers --gender womens --tiled
 
 ## Pattern Drafting Method
 
-The patterns are based on standard pattern drafting techniques with appropriate ease allowances:
+This package supports two pattern drafting methods:
+
+### 1. Basic Pattern Generator (Default)
+
+The basic patterns are based on standard pattern drafting techniques with appropriate ease allowances:
 - **Shirts**: 10cm ease for comfortable fit
 - **Vests**: 8cm ease for closer fit
 - **Trousers**: 8cm ease with proper rise allowances
 - **Coats**: 15cm ease to fit over other clothing
+
+These patterns use simplified geometric calculations suitable for home sewing projects.
+
+### 2. OpenPattern Generator (Optional)
+
+When OpenPattern is installed, you can use the formal pattern drafting method based on professional patternmaking techniques:
+- Uses established methodologies by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnano
+- Provides more accurate pattern blocks with proper dart placement
+- Supports advanced features like pattern grading and customization
+- Generates patterns compatible with industry standards
+
+To use OpenPattern in your Python scripts:
+
+```python
+from pattern_generator import OpenPatternGenerator, Measurements
+
+# Check if OpenPattern is available
+if OpenPatternGenerator.is_available():
+    measurements = Measurements({"chest": 100, "waist": 85, ...})
+    generator = OpenPatternGenerator(measurements)
+    pattern = generator.generate_shirt()
+else:
+    print("OpenPattern not installed, using basic generator")
+```
 
 ## Technical Details
 
@@ -251,7 +305,8 @@ python -m pattern_generator.cli shirt --gender mens
 ## Future Enhancements
 
 Potential improvements for future versions:
-- Integration with OpenPattern library for more sophisticated patterns
+- ✅ Integration with OpenPattern library for more sophisticated patterns (implemented)
+- Command-line option to choose between basic and OpenPattern generators
 - Additional garment types (dresses, skirts, jackets)
 - More size options (S, L, XL, etc.)
 - Pattern grading between sizes

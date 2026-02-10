@@ -1,13 +1,16 @@
-# Example Measurements
+# Example Measurements and Scripts
 
-This directory contains example measurement files in JSON format.
+This directory contains example measurement files in JSON format and demonstration scripts.
 
 ## Files
 
 - `mens_medium.json`: Default men's medium measurements (chest 38-40")
 - `womens_medium.json`: Default women's medium measurements (UK 12-14)
+- `openpattern_example.py`: Example script demonstrating OpenPattern integration
 
 ## Usage
+
+### Using Example Measurements
 
 ```bash
 # Use example measurements
@@ -18,6 +21,18 @@ cp examples/mens_medium.json my_measurements.json
 # Edit my_measurements.json with your actual measurements
 generate-pattern shirt --measurements my_measurements.json
 ```
+
+### Running the OpenPattern Example
+
+```bash
+# Run the OpenPattern demonstration script
+python examples/openpattern_example.py
+```
+
+This script demonstrates:
+- How to check if OpenPattern is installed
+- How to use OpenPatternGenerator for formal pattern drafting
+- Fallback to basic generator if OpenPattern is not available
 
 ## How to Take Measurements
 
