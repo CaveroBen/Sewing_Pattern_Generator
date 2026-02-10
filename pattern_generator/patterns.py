@@ -173,14 +173,14 @@ class PatternGenerator:
     def generate_trousers(self) -> dict:
         """
         Generate professional trouser pattern using OpenPattern's Basic_Trousers.
+        Note: Uses women's patterns for both genders due to OpenPattern database limitations.
         
         Returns:
             Dictionary with OpenPattern pattern object
         """
         gender = self._detect_gender()
         waist = self.measurements.get("waist", 85)
-        gender_prefix = 'W' if gender == 'w' else 'M'
-        # Create pattern name based on waist measurement
+        
         # Map to standard sizes
         if waist < 66:
             size = 36
@@ -198,18 +198,27 @@ class PatternGenerator:
             size = 48
         else:
             size = 50
-        pname = f"{gender_prefix}{size}G"
+        
+        # Use women's pattern for both genders as men's database is incomplete
+        # The patterns are adjusted appropriately by OpenPattern
+        pname = f"W{size}G"
+        actual_gender = 'w'  # Always use 'w' due to database issues with 'm'
         
         # Create trouser pattern using OpenPattern
-        # Use 'Donnano' style as it's more widely supported
-        trousers = OP.Basic_Trousers(pname=pname, gender=gender, style='Donnano')
+        # Try Gilewska first, fall back to Donnano if needed
+        try:
+            trousers = OP.Basic_Trousers(pname=pname, gender=actual_gender, style='Gilewska')
+        except (KeyError, AttributeError):
+            # If Gilewska fails, try Donnano
+            trousers = OP.Basic_Trousers(pname=pname, gender=actual_gender, style='Donnano')
         
         self.patterns["trousers"] = {
             "openpattern_object": trousers,
             "type": "openpattern",
             "garment": "trousers",
             "pname": pname,
-            "gender": gender
+            "gender": gender,  # Store original gender for reference
+            "openpattern_gender": actual_gender  # Store actual gender used
         }
         
         return self.patterns["trousers"]

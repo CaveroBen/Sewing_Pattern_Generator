@@ -54,9 +54,9 @@ def test_simple_openpattern():
 
 
 def test_basic_pattern_generator():
-    """Test basic PatternGenerator without OpenPattern."""
+    """Test basic PatternGenerator with OpenPattern."""
     print("\n" + "="*60)
-    print("TEST 2: Basic PatternGenerator")
+    print("TEST 2: Basic PatternGenerator (OpenPattern-based)")
     print("="*60)
     
     try:
@@ -72,9 +72,10 @@ def test_basic_pattern_generator():
         pattern = generator.generate_shirt()
         
         print("✓ Basic PatternGenerator works!")
-        print(f"  - Pattern pieces: {list(pattern.keys())}")
-        print(f"  - Front piece points: {len(pattern['front']['points'])}")
-        print("  - This works without OpenPattern installed")
+        print(f"  - Pattern type: {pattern.get('type')}")
+        print(f"  - Garment: {pattern.get('garment')}")
+        print(f"  - Pattern name: {pattern.get('pname')}")
+        print(f"  - Uses OpenPattern: {pattern.get('type') == 'openpattern'}")
         return True
         
     except Exception as e:
@@ -110,9 +111,9 @@ def main():
     print("\n" + "="*60)
     print("RECOMMENDATION")
     print("="*60)
-    print("For professional patterns: Use Simple OpenPattern method")
-    print("For basic patterns: Use Basic PatternGenerator")
-    print("\nSee examples/simple_bodice.py for the recommended approach.")
+    print("For professional patterns: Use PatternGenerator or Simple OpenPattern method")
+    print("Both methods now use OpenPattern for professional-grade patterns")
+    print("\nSee examples/simple_bodice.py for direct OpenPattern usage.")
     print("="*60 + "\n")
     
     # Return exit code
