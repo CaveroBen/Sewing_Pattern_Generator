@@ -46,7 +46,7 @@ git clone https://github.com/fmetivier/OpenPattern.git
 cd OpenPattern
 
 # Install OpenPattern
-python setup.py install
+pip install -e .
 ```
 
 **What is OpenPattern?**
@@ -62,7 +62,36 @@ OpenPattern is a Python library for generating professional sewing patterns base
 
 ## Usage
 
-### Basic Usage
+### Simple OpenPattern Usage (Recommended)
+
+If you have OpenPattern installed, you can use it directly with a simple Python script for professional-grade patterns:
+
+```python
+import matplotlib.pyplot as plt
+import OpenPattern as OP
+
+# Create a women's bodice pattern using Gilewska method
+p = OP.Basic_Bodice(
+    pname="W36G",      # Pattern name (W=Women, 36=size, G=Gilewska)
+    gender='w',        # 'w' for women, 'm' for men
+    style='Gilewska'   # Pattern drafting style
+)
+
+# Draw and display the pattern
+p.draw()
+plt.show()
+```
+
+Run the included example:
+```bash
+python examples/simple_bodice.py
+```
+
+This is the simplest way to generate professional bodice patterns with minimal complexity.
+
+### Command-Line Usage
+
+Alternatively, use the command-line tool for basic patterns:
 
 Generate a pattern with default measurements:
 

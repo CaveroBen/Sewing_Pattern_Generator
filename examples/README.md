@@ -4,11 +4,26 @@ This directory contains example measurement files in JSON format and demonstrati
 
 ## Files
 
+- `simple_bodice.py`: **Simple script for generating bodice patterns with OpenPattern** (recommended)
+- `openpattern_example.py`: Example script demonstrating OpenPattern integration with fallback
 - `mens_medium.json`: Default men's medium measurements (chest 38-40")
 - `womens_medium.json`: Default women's medium measurements (UK 12-14)
-- `openpattern_example.py`: Example script demonstrating OpenPattern integration
 
 ## Usage
+
+### Simple Bodice Pattern (Recommended)
+
+The simplest way to generate a professional bodice pattern:
+
+```bash
+# Make sure OpenPattern is installed first
+python examples/simple_bodice.py
+```
+
+This script demonstrates the minimal code needed to create a bodice pattern:
+- Uses OpenPattern's Basic_Bodice class directly
+- Requires only 10 lines of code
+- Produces professional-grade patterns using the Gilewska method
 
 ### Using Example Measurements
 
