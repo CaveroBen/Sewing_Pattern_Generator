@@ -35,6 +35,7 @@ Examples:
     
     parser.add_argument(
         "garment",
+        nargs='?',  # Make optional
         choices=["shirt", "vest", "trousers", "coat"],
         help="Type of garment to generate"
     )
@@ -95,6 +96,10 @@ Examples:
     if args.list_measurements:
         print_measurements_help()
         return 0
+    
+    # Garment is required if not listing measurements
+    if not args.garment:
+        parser.error("garment is required (choose from: shirt, vest, trousers, coat)")
     
     try:
         # Load measurements

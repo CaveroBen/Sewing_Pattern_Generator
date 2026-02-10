@@ -257,5 +257,5 @@ class PatternExporter:
         ax.legend(loc='upper right', fontsize=8)
         
         # Save to JPG
-        plt.savefig(output_path, format='jpg', bbox_inches='tight', dpi=100, quality=85)
+        plt.savefig(output_path, format='jpg', bbox_inches='tight', dpi=100)
         plt.close(fig)
