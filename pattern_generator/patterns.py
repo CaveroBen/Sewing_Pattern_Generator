@@ -4,8 +4,10 @@ This module provides a simplified pattern generation system that can work
 standalone or be extended with OpenPattern library if available.
 """
 
-from typing import Optional, Tuple, List
+from typing import Optional, Tuple, List, Dict, Any
 import os
+import numpy as np
+from scipy.interpolate import CubicSpline
 
 from .measurements import Measurements
 
@@ -32,13 +34,76 @@ class PatternGenerator:
         """
         self.measurements = measurements
         self.patterns = {}
+    
+    @staticmethod
+    def _smooth_curve(points: List[Tuple[float, float]], num_points: int = 20) -> List[Tuple[float, float]]:
+        """
+        Create a smooth curve through the given points using cubic spline interpolation.
+        
+        Args:
+            points: List of (x, y) control points
+            num_points: Number of points in the smooth curve
+            
+        Returns:
+            List of interpolated points forming a smooth curve
+        """
+        if len(points) < 3:
+            return points
+        
+        # Extract x and y coordinates
+        xs = np.array([p[0] for p in points])
+        ys = np.array([p[1] for p in points])
+        
+        # Create parameter t for parametric curve
+        t = np.linspace(0, 1, len(points))
+        t_smooth = np.linspace(0, 1, num_points)
+        
+        # Create cubic splines for x and y
+        try:
+            cs_x = CubicSpline(t, xs, bc_type='natural')
+            cs_y = CubicSpline(t, ys, bc_type='natural')
+            
+            # Generate smooth curve
+            xs_smooth = cs_x(t_smooth)
+            ys_smooth = cs_y(t_smooth)
+            
+            return list(zip(xs_smooth, ys_smooth))
+        except (ValueError, RuntimeError, TypeError) as e:
+            # Fallback to original points if spline fails
+            return points
+    
+    @staticmethod
+    def _create_curve_between(start: Tuple[float, float], end: Tuple[float, float], 
+                             control: Tuple[float, float], num_points: int = 15) -> List[Tuple[float, float]]:
+        """
+        Create a smooth curve between two points using a control point (quadratic Bezier).
+        
+        Args:
+            start: Starting point (x, y)
+            end: Ending point (x, y)
+            control: Control point that defines the curve (x, y)
+            num_points: Number of points in the curve
+            
+        Returns:
+            List of points forming a smooth curve
+        """
+        t_values = np.linspace(0, 1, num_points)
+        curve_points = []
+        
+        for t in t_values:
+            # Quadratic Bezier formula: B(t) = (1-t)^2*P0 + 2(1-t)t*P1 + t^2*P2
+            x = (1-t)**2 * start[0] + 2*(1-t)*t * control[0] + t**2 * end[0]
+            y = (1-t)**2 * start[1] + 2*(1-t)*t * control[1] + t**2 * end[1]
+            curve_points.append((x, y))
+        
+        return curve_points
         
     def generate_shirt(self) -> dict:
         """
-        Generate a basic shirt pattern (front and back bodice).
+        Generate a basic shirt pattern (front and back bodice) with proper curves and metadata.
         
         Returns:
-            Dictionary with pattern pieces
+            Dictionary with pattern pieces including metadata
         """
         m = self.measurements
         
@@ -57,9 +122,27 @@ class PatternGenerator:
         half_waist = (waist + ease) / 2
         
         patterns = {
-            "front": self._create_bodice_front(half_chest, half_waist, shoulder, neck, length),
-            "back": self._create_bodice_back(half_chest, half_waist, shoulder, neck, length),
-            "sleeve": self._create_sleeve(sleeve, m.get("bicep", 32), m.get("wrist", 16)),
+            "front": {
+                "points": self._create_bodice_front(half_chest, half_waist, shoulder, neck, length),
+                "label": "FRONT BODICE",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "back": {
+                "points": self._create_bodice_back(half_chest, half_waist, shoulder, neck, length),
+                "label": "BACK BODICE",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "sleeve": {
+                "points": self._create_sleeve(sleeve, m.get("bicep", 32), m.get("wrist", 16)),
+                "label": "SLEEVE",
+                "cutting": "Cut 2",
+                "grainline": "vertical",
+                "notches": []
+            },
         }
         
         self.patterns["shirt"] = patterns
@@ -67,10 +150,10 @@ class PatternGenerator:
     
     def generate_vest(self) -> dict:
         """
-        Generate a basic vest/waistcoat pattern.
+        Generate a basic vest/waistcoat pattern with metadata.
         
         Returns:
-            Dictionary with pattern pieces
+            Dictionary with pattern pieces including metadata
         """
         m = self.measurements
         
@@ -86,8 +169,20 @@ class PatternGenerator:
         half_waist = (waist + ease) / 2
         
         patterns = {
-            "front": self._create_vest_front(half_chest, half_waist, shoulder, neck, length),
-            "back": self._create_vest_back(half_chest, half_waist, shoulder, neck, length),
+            "front": {
+                "points": self._create_vest_front(half_chest, half_waist, shoulder, neck, length),
+                "label": "VEST FRONT",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "back": {
+                "points": self._create_vest_back(half_chest, half_waist, shoulder, neck, length),
+                "label": "VEST BACK",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
         }
         
         self.patterns["vest"] = patterns
@@ -95,10 +190,10 @@ class PatternGenerator:
     
     def generate_trousers(self) -> dict:
         """
-        Generate basic trouser pattern.
+        Generate basic trouser pattern with metadata.
         
         Returns:
-            Dictionary with pattern pieces
+            Dictionary with pattern pieces including metadata
         """
         m = self.measurements
         
@@ -113,8 +208,20 @@ class PatternGenerator:
         half_hip = (hip + ease) / 2
         
         patterns = {
-            "front": self._create_trouser_front(half_waist, half_hip, rise, inseam),
-            "back": self._create_trouser_back(half_waist, half_hip, rise, inseam),
+            "front": {
+                "points": self._create_trouser_front(half_waist, half_hip, rise, inseam),
+                "label": "TROUSER FRONT",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "back": {
+                "points": self._create_trouser_back(half_waist, half_hip, rise, inseam),
+                "label": "TROUSER BACK",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
         }
         
         self.patterns["trousers"] = patterns
@@ -122,10 +229,10 @@ class PatternGenerator:
     
     def generate_coat(self) -> dict:
         """
-        Generate basic coat pattern (extended shirt with more ease).
+        Generate basic coat pattern (extended shirt with more ease) with metadata.
         
         Returns:
-            Dictionary with pattern pieces
+            Dictionary with pattern pieces including metadata
         """
         m = self.measurements
         
@@ -142,9 +249,27 @@ class PatternGenerator:
         half_waist = (waist + ease) / 2
         
         patterns = {
-            "front": self._create_coat_front(half_chest, half_waist, shoulder, neck, length),
-            "back": self._create_coat_back(half_chest, half_waist, shoulder, neck, length),
-            "sleeve": self._create_sleeve(sleeve, m.get("bicep", 32) + 5, m.get("wrist", 16) + 2),
+            "front": {
+                "points": self._create_coat_front(half_chest, half_waist, shoulder, neck, length),
+                "label": "COAT FRONT",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "back": {
+                "points": self._create_coat_back(half_chest, half_waist, shoulder, neck, length),
+                "label": "COAT BACK",
+                "cutting": "Cut 2 (1 pair)",
+                "grainline": "vertical",
+                "notches": []
+            },
+            "sleeve": {
+                "points": self._create_sleeve(sleeve, m.get("bicep", 32) + 5, m.get("wrist", 16) + 2),
+                "label": "COAT SLEEVE",
+                "cutting": "Cut 2",
+                "grainline": "vertical",
+                "notches": []
+            },
         }
         
         self.patterns["coat"] = patterns
@@ -152,180 +277,328 @@ class PatternGenerator:
     
     def _create_bodice_front(self, half_chest: float, half_waist: float, 
                              shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create front bodice pattern piece."""
+        """Create front bodice pattern piece with smooth curves."""
         neck_width = neck / 6
         neck_depth = neck / 6 + 1
         armhole_depth = length / 4
+        shoulder_end = shoulder / 2
         
-        # Define pattern outline points (x, y coordinates in cm)
-        points = [
-            (0, 0),  # Shoulder point
-            (neck_width, 0),  # Neck width
-            (neck_width, neck_depth),  # Neck depth
-            (shoulder / 2, 0),  # Shoulder end
-            (shoulder / 2, armhole_depth),  # Armhole depth
-            (half_chest, armhole_depth + 5),  # Side seam at chest
-            (half_waist, length),  # Side seam at waist
-            (5, length),  # Center front at waist
-            (0, neck_depth),  # Center front at neck
-            (0, 0),  # Back to start
-        ]
+        # Define key points
+        center_neck = (0, 0)
+        neck_side = (neck_width, 0)
+        neck_bottom = (neck_width, neck_depth)
+        shoulder_tip = (shoulder_end, -1)  # Slight drop for shoulder slope
+        armhole_top = (shoulder_end, armhole_depth * 0.3)
+        underarm = (half_chest, armhole_depth + 5)
+        side_waist = (half_waist, length)
+        center_waist = (5, length)
+        center_bottom = (0, neck_depth)
+        
+        # Create smooth neckline curve
+        neckline = self._create_curve_between(
+            center_neck, neck_side, 
+            (neck_width * 0.5, -0.5),  # Control point for curved neckline
+            num_points=10
+        )
+        
+        # Create smooth armhole curve
+        armhole_points = [shoulder_tip, armhole_top, underarm]
+        armhole_curve = self._smooth_curve(armhole_points, num_points=15)
+        
+        # Assemble the complete pattern outline
+        points = (
+            neckline +
+            [(neck_side[0], neck_side[1])] +
+            armhole_curve +
+            [(underarm[0], underarm[1]), side_waist, center_waist, center_bottom] +
+            [(center_neck[0], center_neck[1])]
+        )
+        
         return points
     
     def _create_bodice_back(self, half_chest: float, half_waist: float,
                             shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create back bodice pattern piece."""
+        """Create back bodice pattern piece with smooth curves."""
         neck_width = neck / 6
-        neck_depth = neck / 20
+        neck_depth = neck / 20  # Shallower neckline for back
         armhole_depth = length / 4
+        shoulder_end = shoulder / 2
         
-        points = [
-            (0, 0),
-            (neck_width, 0),
-            (neck_width, neck_depth),
-            (shoulder / 2, 0),
-            (shoulder / 2, armhole_depth),
-            (half_chest, armhole_depth + 5),
-            (half_waist, length),
-            (5, length),
-            (0, neck_depth),
-            (0, 0),
-        ]
+        # Define key points
+        center_neck = (0, 0)
+        neck_side = (neck_width, 0)
+        shoulder_tip = (shoulder_end, -0.5)  # Slight slope
+        armhole_top = (shoulder_end, armhole_depth * 0.3)
+        underarm = (half_chest, armhole_depth + 5)
+        side_waist = (half_waist, length)
+        center_waist = (5, length)
+        center_top = (0, neck_depth)
+        
+        # Create smooth back neckline
+        back_neckline = self._create_curve_between(
+            center_neck, neck_side,
+            (neck_width * 0.5, -0.3),  # Gentler curve for back neck
+            num_points=8
+        )
+        
+        # Create smooth armhole curve
+        armhole_points = [shoulder_tip, armhole_top, underarm]
+        armhole_curve = self._smooth_curve(armhole_points, num_points=15)
+        
+        # Assemble complete pattern
+        points = (
+            back_neckline +
+            [(neck_side[0], neck_side[1])] +
+            armhole_curve +
+            [(underarm[0], underarm[1]), side_waist, center_waist, center_top] +
+            [(center_neck[0], center_neck[1])]
+        )
+        
         return points
     
     def _create_sleeve(self, length: float, bicep: float, wrist: float) -> List[Tuple[float, float]]:
-        """Create sleeve pattern piece."""
+        """Create sleeve pattern piece with smooth sleeve cap curve."""
         cap_height = bicep / 3
         half_bicep = bicep / 2
         half_wrist = wrist / 2
         
-        points = [
-            (half_bicep, 0),  # Center top
-            (0, cap_height),  # Armhole curve
-            (0, length - 5),  # Sleeve length
-            (half_wrist, length),  # Wrist
-            (bicep, length - 5),  # Other side
-            (bicep, cap_height),  # Other armhole
-            (half_bicep, 0),  # Back to top
-        ]
+        # Define key points for sleeve cap (the curved top)
+        cap_center = (half_bicep, 0)
+        cap_left_mid = (half_bicep * 0.3, cap_height * 0.7)
+        cap_left = (0, cap_height)
+        underarm_left = (0, length - 5)
+        wrist_left = (half_wrist * 0.7, length)
+        wrist_center = (half_bicep, length)
+        wrist_right = (bicep - half_wrist * 0.7, length)
+        underarm_right = (bicep, length - 5)
+        cap_right = (bicep, cap_height)
+        cap_right_mid = (bicep - half_bicep * 0.3, cap_height * 0.7)
+        
+        # Create smooth sleeve cap curve
+        left_cap_points = [cap_center, cap_left_mid, cap_left]
+        left_cap = self._smooth_curve(left_cap_points, num_points=12)
+        
+        right_cap_points = [cap_center, cap_right_mid, cap_right]
+        right_cap = self._smooth_curve(right_cap_points, num_points=12)
+        
+        # Assemble sleeve pattern
+        points = (
+            left_cap +
+            [underarm_left, wrist_left, wrist_center, wrist_right, underarm_right] +
+            list(reversed(right_cap))
+        )
+        
         return points
     
     def _create_vest_front(self, half_chest: float, half_waist: float,
                            shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create front vest pattern piece (lower neckline, no sleeves)."""
+        """Create front vest pattern piece with V-neck and smooth curves."""
         neck_width = neck / 5
         neck_depth = neck / 4  # Deeper V-neck for vest
+        shoulder_end = shoulder / 2
         
-        points = [
-            (0, 0),
-            (neck_width, 0),
-            (neck_width, neck_depth),
-            (shoulder / 2, 0),
-            (half_chest, length / 3),  # Armhole for vest
-            (half_waist, length),
-            (5, length + 5),  # Slightly longer at center
-            (0, neck_depth),
-            (0, 0),
-        ]
+        # Key points
+        center_top = (0, 0)
+        v_neck_point = (neck_width, neck_depth)  # Point of V
+        shoulder_tip = (shoulder_end, -1)
+        armhole_mid = (shoulder_end, length / 4)
+        underarm = (half_chest, length / 3)
+        side_waist = (half_waist, length)
+        center_waist = (5, length + 5)  # Slightly longer at center
+        
+        # Create V-neckline (straight lines for V)
+        v_neck = [(center_top), v_neck_point]
+        
+        # Create smooth armhole
+        armhole_points = [shoulder_tip, armhole_mid, underarm]
+        armhole = self._smooth_curve(armhole_points, num_points=12)
+        
+        # Assemble pattern
+        points = (
+            v_neck +
+            armhole +
+            [side_waist, center_waist] +
+            [(center_top[0], center_top[1])]
+        )
+        
         return points
     
     def _create_vest_back(self, half_chest: float, half_waist: float,
                           shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create back vest pattern piece."""
+        """Create back vest pattern piece with smooth curves."""
         neck_width = neck / 6
         neck_depth = neck / 20
+        shoulder_end = shoulder / 2
         
-        points = [
-            (0, 0),
-            (neck_width, 0),
-            (neck_width, neck_depth),
-            (shoulder / 2, 0),
-            (half_chest, length / 3),
-            (half_waist, length),
-            (5, length),
-            (0, neck_depth),
-            (0, 0),
-        ]
+        # Key points
+        center_top = (0, 0)
+        neck_side = (neck_width, 0)
+        shoulder_tip = (shoulder_end, -0.5)
+        armhole_mid = (shoulder_end, length / 4)
+        underarm = (half_chest, length / 3)
+        side_waist = (half_waist, length)
+        center_waist = (5, length)
+        center_neck = (0, neck_depth)
+        
+        # Create smooth neckline
+        neckline = self._create_curve_between(
+            center_top, neck_side,
+            (neck_width * 0.5, -0.2),
+            num_points=8
+        )
+        
+        # Create smooth armhole
+        armhole_points = [shoulder_tip, armhole_mid, underarm]
+        armhole = self._smooth_curve(armhole_points, num_points=12)
+        
+        # Assemble pattern
+        points = (
+            neckline +
+            [(neck_side[0], neck_side[1])] +
+            armhole +
+            [side_waist, center_waist, center_neck] +
+            [(center_top[0], center_top[1])]
+        )
+        
         return points
     
     def _create_trouser_front(self, half_waist: float, half_hip: float,
                               rise: float, inseam: float) -> List[Tuple[float, float]]:
-        """Create front trouser pattern piece."""
+        """Create front trouser pattern piece with smooth curves."""
         crotch_extension = half_hip / 10
         knee = half_hip * 0.6
         ankle = half_hip * 0.45
         
-        points = [
-            (0, 0),  # Waist side
-            (half_waist, 0),  # Waist center
-            (half_waist + crotch_extension, rise),  # Crotch point
-            (half_hip * 0.6, rise + inseam / 2),  # Knee
-            (ankle / 2, rise + inseam),  # Ankle
-            (0, rise + inseam),  # Ankle side
-            (0, rise),  # Hip side
-            (0, 0),  # Back to waist
-        ]
+        # Key points
+        waist_side = (0, 0)
+        waist_center = (half_waist, 0)
+        crotch = (half_waist + crotch_extension, rise)
+        knee_inside = (half_hip * 0.6, rise + inseam / 2)
+        ankle_inside = (ankle / 2, rise + inseam)
+        ankle_outside = (0, rise + inseam)
+        hip_side = (0, rise)
+        
+        # Create smooth crotch curve
+        crotch_points = [waist_center, crotch, knee_inside]
+        crotch_curve = self._smooth_curve(crotch_points, num_points=15)
+        
+        # Assemble pattern
+        points = (
+            [waist_side, waist_center] +
+            crotch_curve +
+            [ankle_inside, ankle_outside, hip_side, waist_side]
+        )
+        
         return points
     
     def _create_trouser_back(self, half_waist: float, half_hip: float,
                              rise: float, inseam: float) -> List[Tuple[float, float]]:
-        """Create back trouser pattern piece."""
+        """Create back trouser pattern piece with smooth curves."""
         crotch_extension = half_hip / 8
         knee = half_hip * 0.65
         ankle = half_hip * 0.5
         
-        points = [
-            (0, 0),
-            (half_waist + 3, 0),  # Wider at back
-            (half_waist + crotch_extension, rise + 3),  # Deeper crotch
-            (half_hip * 0.65, rise + inseam / 2),
-            (ankle / 2, rise + inseam),
-            (0, rise + inseam),
-            (0, rise),
-            (0, 0),
-        ]
+        # Key points
+        waist_side = (0, 0)
+        waist_center = (half_waist + 3, 0)  # Wider at back
+        crotch = (half_waist + crotch_extension, rise + 3)  # Deeper crotch
+        knee_inside = (half_hip * 0.65, rise + inseam / 2)
+        ankle_inside = (ankle / 2, rise + inseam)
+        ankle_outside = (0, rise + inseam)
+        hip_side = (0, rise)
+        
+        # Create smooth crotch curve
+        crotch_points = [waist_center, crotch, knee_inside]
+        crotch_curve = self._smooth_curve(crotch_points, num_points=15)
+        
+        # Assemble pattern
+        points = (
+            [waist_side, waist_center] +
+            crotch_curve +
+            [ankle_inside, ankle_outside, hip_side, waist_side]
+        )
+        
         return points
     
     def _create_coat_front(self, half_chest: float, half_waist: float,
                            shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create front coat pattern piece (extended bodice)."""
+        """Create front coat pattern piece (extended bodice) with smooth curves."""
         neck_width = neck / 6
         neck_depth = neck / 5  # Deeper for lapel
         armhole_depth = length / 5
+        shoulder_end = shoulder / 2
         
-        points = [
-            (0, 0),
-            (neck_width, 0),
-            (neck_width, neck_depth),
-            (shoulder / 2, 0),
-            (shoulder / 2, armhole_depth),
-            (half_chest, armhole_depth + 5),
-            (half_chest + 2, length * 0.7),  # Slight A-line
-            (5, length),
-            (0, neck_depth),
-            (0, 0),
-        ]
+        # Key points
+        center_top = (0, 0)
+        neck_side = (neck_width, 0)
+        neck_bottom = (neck_width, neck_depth)
+        shoulder_tip = (shoulder_end, -1)
+        armhole_top = (shoulder_end, armhole_depth)
+        underarm = (half_chest, armhole_depth + 5)
+        side_hip = (half_chest + 2, length * 0.7)  # Slight A-line
+        center_hem = (5, length)
+        center_neck = (0, neck_depth)
+        
+        # Create smooth neckline/lapel
+        neckline = self._create_curve_between(
+            center_top, neck_side,
+            (neck_width * 0.5, -0.5),
+            num_points=10
+        )
+        
+        # Create smooth armhole
+        armhole_points = [shoulder_tip, armhole_top, underarm]
+        armhole = self._smooth_curve(armhole_points, num_points=15)
+        
+        # Assemble pattern
+        points = (
+            neckline +
+            [(neck_side[0], neck_side[1])] +
+            armhole +
+            [side_hip, center_hem, center_neck] +
+            [(center_top[0], center_top[1])]
+        )
+        
         return points
     
     def _create_coat_back(self, half_chest: float, half_waist: float,
                           shoulder: float, neck: float, length: float) -> List[Tuple[float, float]]:
-        """Create back coat pattern piece."""
+        """Create back coat pattern piece with smooth curves."""
         neck_width = neck / 6
         neck_depth = neck / 20
         armhole_depth = length / 5
+        shoulder_end = shoulder / 2
         
-        points = [
-            (0, 0),
-            (neck_width, 0),
-            (neck_width, neck_depth),
-            (shoulder / 2, 0),
-            (shoulder / 2, armhole_depth),
-            (half_chest, armhole_depth + 5),
-            (half_chest + 2, length * 0.7),
-            (5, length),
-            (0, neck_depth),
-            (0, 0),
-        ]
+        # Key points
+        center_top = (0, 0)
+        neck_side = (neck_width, 0)
+        shoulder_tip = (shoulder_end, -0.5)
+        armhole_top = (shoulder_end, armhole_depth)
+        underarm = (half_chest, armhole_depth + 5)
+        side_hip = (half_chest + 2, length * 0.7)
+        center_hem = (5, length)
+        center_neck = (0, neck_depth)
+        
+        # Create smooth neckline
+        neckline = self._create_curve_between(
+            center_top, neck_side,
+            (neck_width * 0.5, -0.3),
+            num_points=8
+        )
+        
+        # Create smooth armhole
+        armhole_points = [shoulder_tip, armhole_top, underarm]
+        armhole = self._smooth_curve(armhole_points, num_points=15)
+        
+        # Assemble pattern
+        points = (
+            neckline +
+            [(neck_side[0], neck_side[1])] +
+            armhole +
+            [side_hip, center_hem, center_neck] +
+            [(center_top[0], center_top[1])]
+        )
+        
         return points
 
 
