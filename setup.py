@@ -1,17 +1,17 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
     name="sewing-pattern-generator",
-    version="0.1.0",
+    version="0.2.0",
     author="CaveroBen",
-    description="A Python script to generate bespoke sewing patterns",
+    description="A simple interface to OpenPattern for generating professional sewing patterns",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/CaveroBen/Sewing_Pattern_Generator",
-    packages=find_packages(),
+    py_modules=["generate_patterns"],
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
@@ -20,14 +20,5 @@ setup(
     python_requires=">=3.7",
     install_requires=[
         "matplotlib>=3.5.0",
-        "numpy>=1.21.0",
-        "scipy>=1.8.0",
-        "Pillow>=10.2.0",
-        "reportlab>=3.6.13",
     ],
-    entry_points={
-        "console_scripts": [
-            "generate-pattern=pattern_generator.cli:main",
-        ],
-    },
 )

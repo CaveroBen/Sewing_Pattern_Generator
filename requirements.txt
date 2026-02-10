@@ -1,19 +1,8 @@
 # Core dependencies
 matplotlib>=3.5.0
-numpy>=1.21.0
-scipy>=1.8.0
-Pillow>=10.2.0
 
-# PDF generation
-reportlab>=3.6.13
+# PDF generation from matplotlib
+# The pattern will be saved as PDF using matplotlib's savefig
 
-# Optional: OpenPattern for formal pattern drafting
-# OpenPattern provides professional-grade pattern generation based on
-# established patternmaking methodologies. Installation instructions:
-#
-# git clone https://github.com/fmetivier/OpenPattern.git
-# cd OpenPattern
-# python setup.py install
-#
-# Note: The basic pattern generator works without OpenPattern.
-# OpenPattern is recommended for professional tailoring applications.
+# OpenPattern - Required for pattern generation
+# Installation: pip install git+https://github.com/fmetivier/OpenPattern.git

@@ -1,85 +1,40 @@
-# Example Measurements and Scripts
+# OpenPattern Examples
 
-This directory contains example measurement files in JSON format and demonstration scripts.
+This directory contains example scripts demonstrating how to generate different types of sewing patterns using the OpenPattern library.
 
-## Files
+## Examples
 
-- `simple_bodice.py`: **Simple script for generating bodice patterns with OpenPattern** (recommended)
-- `openpattern_example.py`: Example script demonstrating OpenPattern integration with fallback
-- `mens_medium.json`: Default men's medium measurements (chest 38-40")
-- `womens_medium.json`: Default women's medium measurements (UK 12-14)
-
-## Usage
-
-### Simple Bodice Pattern (Recommended)
-
-The simplest way to generate a professional bodice pattern:
-
+### Bodice Pattern
 ```bash
-# Make sure OpenPattern is installed first
-python examples/simple_bodice.py
+python bodice_example.py
 ```
+Generates a women's basic bodice pattern using the Gilewska drafting style.
 
-This script demonstrates the minimal code needed to create a bodice pattern:
-- Uses OpenPattern's Basic_Bodice class directly
-- Requires only 10 lines of code
-- Produces professional-grade patterns using the Gilewska method
-
-### Using Example Measurements
-
+### Skirt Pattern
 ```bash
-# Use example measurements
-generate-pattern shirt --measurements examples/mens_medium.json
-
-# Create your own measurements file
-cp examples/mens_medium.json my_measurements.json
-# Edit my_measurements.json with your actual measurements
-generate-pattern shirt --measurements my_measurements.json
+python skirt_example.py
 ```
+Generates a women's basic skirt pattern using the Chiappetta drafting style.
 
-### Running the OpenPattern Example
-
+### Trousers Pattern
 ```bash
-# Run the OpenPattern demonstration script
-python examples/openpattern_example.py
+python trousers_example.py
 ```
+Generates a men's basic trousers pattern using the Donnanno drafting style.
 
-This script demonstrates:
-- How to check if OpenPattern is installed
-- How to use OpenPatternGenerator for formal pattern drafting
-- Fallback to basic generator if OpenPattern is not available
+## Output
 
-## How to Take Measurements
+Each example will:
+1. Generate the pattern using OpenPattern
+2. Save the pattern as a PDF file
+3. Display the pattern in a matplotlib window
 
-### General Tips
-- Use a soft measuring tape
-- Wear fitted clothing or underwear
-- Stand naturally, don't hold your breath
-- Have someone help you for accuracy
-- Measure in centimeters
+## Customization
 
-### Taking Each Measurement
+You can modify the pattern parameters in each example:
+- `pname`: Pattern name/size identifier
+- `gender`: 'w' for women, 'm' for men
+- `style`: Drafting style (Gilewska, Chiappetta, Donnanno)
+- Additional parameters specific to each pattern type
 
-**Chest/Bust**: Measure around the fullest part of the chest, keeping the tape horizontal and comfortable (not tight).
-
-**Waist**: Measure around the natural waistline (smallest part of torso, usually just above belly button).
-
-**Hip**: Measure around the fullest part of the hips and buttocks.
-
-**Shoulder Width**: Measure from shoulder point to shoulder point across the back.
-
-**Neck**: Measure around the base of the neck where a shirt collar would sit.
-
-**Sleeve Length**: Measure from shoulder point to wrist bone with arm slightly bent.
-
-**Bicep**: Measure around the fullest part of the upper arm.
-
-**Wrist**: Measure around the wrist bone.
-
-**Inseam**: Measure from crotch to ankle along the inside of the leg.
-
-**Outseam**: Measure from waist to ankle along the outside of the leg.
-
-**Rise**: Measure from waist (back) down through crotch to waist (front).
-
-**Nape to Waist**: Measure from the base of the neck down the spine to the waistline.
+Refer to the OpenPattern documentation for more options and customization possibilities.
