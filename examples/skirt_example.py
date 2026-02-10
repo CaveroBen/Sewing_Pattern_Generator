@@ -15,7 +15,7 @@ import OpenPattern as OP
 p = OP.Basic_Skirt(
     pname="W6C",        # Pattern name (W=Women, size 6, C=Chiappetta)
     style='Chiappetta', # Pattern drafting style
-    gender='G',         # 'G' for general/women (required for some OpenPattern versions)
+    gender='G',         # 'G' for skirts (OpenPattern-specific; different from 'w' or 'm' used in other patterns)
     ease=8,             # Ease in cm
     curves=False        # Use straight lines instead of curves
 )

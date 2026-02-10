@@ -42,8 +42,8 @@ python generate_patterns.py
 
 This will create three PDF files in the `output/` directory:
 - `bodice_W36G.pdf` - Women's bodice (Gilewska style)
-- `skirt_W36C.pdf` - Women's skirt (Chiappetta style)
-- `M44D_basic_trousers.pdf` - Men's trousers (Donnanno style)
+- `skirt_W6C.pdf` - Women's skirt (Chiappetta style)
+- `Donnanno_Basic_Trousers_M44D_FullSize.pdf` - Men's trousers (Donnanno style)
 
 ### Individual Pattern Examples
 
@@ -95,7 +95,8 @@ plt.show()
 ### Basic Skirt
 - **Style**: Chiappetta
 - **Parameters**: pname, gender, style, ease, curves
-- **Example**: `OP.Basic_Skirt(pname="W36C", gender='w', style='Chiappetta', ease=8, curves=False)`
+- **Example**: `OP.Basic_Skirt(pname="W6C", gender='G', style='Chiappetta', ease=8, curves=False)`
+- **Note**: Skirt patterns use `gender='G'` (general/women) and simpler pattern names like "W6C" instead of "W36C"
 
 ### Basic Trousers
 - **Style**: Donnanno
@@ -123,10 +124,10 @@ You can customize patterns by modifying parameters:
 p = OP.Basic_Bodice(pname="W40G", gender='w', style='Gilewska')
 
 # Skirt with more ease
-p = OP.Basic_Skirt(pname="W38C", gender='w', style='Chiappetta', ease=10, curves=True)
+p = OP.Basic_Skirt(pname="W6C", gender='G', style='Chiappetta', ease=10, curves=True)
 
 # Women's trousers
-pans = OP.Basic_Trousers(pname="W38D", gender='w', style='Donnanno', darts=True)
+trousers = OP.Basic_Trousers(pname="W38D", gender='w', style='Donnanno', darts=True)
 ```
 
 ## Output
