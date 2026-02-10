@@ -1,0 +1,22 @@
+{
+  "bust": 96.5,
+  "underbust": 79.0,
+  "waist": 76.0,
+  "hip": 101.5,
+  "shoulder_width": 39.0,
+  "across_back": 36.0,
+  "neck": 35.0,
+  "sleeve_length": 60.0,
+  "arm_length": 78.0,
+  "bicep": 28.0,
+  "wrist": 15.0,
+  "inseam": 79.0,
+  "outseam": 104.0,
+  "thigh": 58.0,
+  "knee": 38.0,
+  "ankle": 22.0,
+  "rise": 26.0,
+  "height": 168.0,
+  "nape_to_waist": 42.0,
+  "waist_to_hip": 20.0
+}

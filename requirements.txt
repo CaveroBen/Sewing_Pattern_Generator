@@ -1,0 +1,16 @@
+# Core dependencies
+matplotlib>=3.5.0
+numpy>=1.21.0
+scipy>=1.7.0
+Pillow>=9.0.0
+
+# PDF generation
+reportlab>=3.6.0
+
+# CLI
+argparse
+
+# Note: OpenPattern installation instructions:
+# git clone https://github.com/fmetivier/OpenPattern.git
+# cd OpenPattern
+# python setup.py install
