@@ -4,10 +4,6 @@ This module provides a simplified pattern generation system that can work
 standalone or be extended with OpenPattern library if available.
 """
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
 from typing import Optional, Tuple, List
 import os
 

@@ -7,9 +7,6 @@ Pillow>=9.0.0
 # PDF generation
 reportlab>=3.6.0
 
-# CLI
-argparse
-
 # Note: OpenPattern installation instructions:
 # git clone https://github.com/fmetivier/OpenPattern.git
 # cd OpenPattern

@@ -4,14 +4,11 @@ Handles PDF generation (full-size and tiled A4) and JPG thumbnail creation.
 """
 
 import matplotlib.pyplot as plt
-import matplotlib.patches as patches
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.figure import Figure
 import numpy as np
-from PIL import Image
 from typing import List, Tuple, Optional
 import os
-import io
 import math
 
 
