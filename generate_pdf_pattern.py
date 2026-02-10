@@ -15,6 +15,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from pattern_generator import PatternGenerator, DefaultMeasurements
 from pattern_generator.export import PatternExporter
 
+# Check if OpenPattern is available
+try:
+    import OpenPattern as OP
+    OPENPATTERN_AVAILABLE = True
+except ImportError:
+    OPENPATTERN_AVAILABLE = False
+
 
 def get_user_input(prompt, default, valid_options=None):
     """
@@ -119,6 +126,13 @@ def main():
     print("=" * 60)
     print("Interactive PDF Pattern Generator")
     print("=" * 60)
+    
+    # Show OpenPattern status
+    if OPENPATTERN_AVAILABLE:
+        print("✓ OpenPattern available - using professional pattern generation")
+    else:
+        print("ℹ Using basic pattern generation (install OpenPattern for professional patterns)")
+    
     print("\nThis tool will help you generate a PDF sewing pattern.")
     print("Press Enter to accept default values shown in [brackets].\n")
     
