@@ -5,6 +5,8 @@ Example: Generate a Basic Bodice Pattern
 This example demonstrates how to generate a basic bodice pattern
 using the OpenPattern library with Gilewska style drafting.
 """
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 
 import matplotlib.pyplot as plt
 import OpenPattern as OP

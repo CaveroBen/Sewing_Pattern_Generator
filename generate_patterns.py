@@ -12,6 +12,8 @@ All patterns are exported as PDF files.
 
 import os
 import sys
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 import matplotlib.pyplot as plt
 
 try:
@@ -57,13 +59,13 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
     return pdf_path
 
 
-def generate_skirt(pname="W36C", gender='w', style='Chiappetta', ease=8, curves=False, output_dir='output'):
+def generate_skirt(pname="W6C", gender='G', style='Chiappetta', ease=8, curves=False, output_dir='output'):
     """
     Generate a basic skirt pattern.
     
     Args:
-        pname: Pattern name (e.g., W36C = Women's size 36, Chiappetta style)
-        gender: 'w' for women, 'm' for men
+        pname: Pattern name (e.g., W6C = Women's size, Chiappetta style)
+        gender: Gender code (use 'G' for general/women)
         style: Pattern drafting style (e.g., 'Chiappetta')
         ease: Ease in cm
         curves: Whether to use curves
@@ -152,8 +154,8 @@ def main():
     )
     
     skirt_pdf = generate_skirt(
-        pname="W36C",
-        gender='w',
+        pname="W6C",
+        gender='G',
         style='Chiappetta',
         ease=8,
         curves=False,

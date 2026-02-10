@@ -5,6 +5,8 @@ Example: Generate Basic Trousers Pattern
 This example demonstrates how to generate a basic trousers pattern
 using the OpenPattern library with Donnanno style drafting.
 """
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 
 import matplotlib.pyplot as plt
 import OpenPattern as OP

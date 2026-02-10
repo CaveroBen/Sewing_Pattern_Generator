@@ -5,15 +5,17 @@ Example: Generate a Basic Skirt Pattern
 This example demonstrates how to generate a basic skirt pattern
 using the OpenPattern library with Chiappetta style drafting.
 """
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 
 import matplotlib.pyplot as plt
 import OpenPattern as OP
 
 # Create a skirt pattern using Chiappetta method
 p = OP.Basic_Skirt(
-    pname="W36C",       # Pattern name (W=Women, 36=size, C=Chiappetta)
+    pname="W6C",        # Pattern name (W=Women, size 6, C=Chiappetta)
     style='Chiappetta', # Pattern drafting style
-    gender='w',         # 'w' for women, 'm' for men
+    gender='G',         # 'G' for general/women (required for some OpenPattern versions)
     ease=8,             # Ease in cm
     curves=False        # Use straight lines instead of curves
 )
