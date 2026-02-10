@@ -1,63 +1,73 @@
 #!/usr/bin/env python3
 """
-Example script demonstrating how to use OpenPatternGenerator.
+Example script demonstrating how to use the PatternGenerator with OpenPattern.
 
-This script shows how to check for OpenPattern availability and use it
-to generate professional-grade sewing patterns.
+This script shows how the PatternGenerator now uses OpenPattern methods
+for professional-grade sewing patterns.
 """
+
+import sys
+import os
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from pattern_generator import (
     PatternGenerator, 
-    OpenPatternGenerator, 
     Measurements,
     DefaultMeasurements
 )
+from pattern_generator.export import PatternExporter
 
 def main():
-    # Load measurements
-    measurements = DefaultMeasurements.get_default("mens", "medium")
-    
     print("Sewing Pattern Generator - OpenPattern Example")
-    print("=" * 50)
+    print("=" * 60)
     
-    # Check if OpenPattern is available
-    if OpenPatternGenerator.is_available():
-        print("✓ OpenPattern is installed and available")
-        print("\nUsing OpenPattern for formal pattern drafting...")
-        
-        # Create OpenPattern generator
-        generator = OpenPatternGenerator(measurements)
-        
-        # Generate a shirt pattern
-        print("Generating shirt pattern...")
-        pattern = generator.generate_shirt()
-        
-        print(f"✓ Pattern generated successfully")
-        print(f"  Pattern type: {pattern.get('type', 'unknown')}")
-        print(f"  Garment: {pattern.get('garment', 'unknown')}")
-        
-        print("\nNote: To export OpenPattern patterns to PDF, use")
-        print("OpenPattern's built-in export methods:")
-        print("  pattern['bodice'].draw({'Pattern': 'Shirt'}, save=True)")
-        print("\nThis will save the pattern as 'Shirt.pdf' in the current directory.")
-        print("The PDF will be at 1:1 scale suitable for professional printing.")
-        
-    else:
-        print("✗ OpenPattern is not installed")
-        print("\nTo use OpenPattern, install it with:")
-        print("  git clone https://github.com/fmetivier/OpenPattern.git")
-        print("  cd OpenPattern")
-        print("  python setup.py install")
-        print("\nFalling back to basic pattern generator...")
-        
-        # Use basic generator instead
-        generator = PatternGenerator(measurements)
-        pattern = generator.generate_shirt()
-        
-        print("✓ Shirt pattern generated using basic method")
-        print(f"  Pattern pieces: {list(pattern.keys())}")
-        print("\nTo export this pattern, use the CLI:")
-        print("  generate-pattern shirt --gender mens")
+    # Load measurements
+    print("\n1. Loading measurements...")
+    measurements = DefaultMeasurements.get_default("womens", "medium")
+    print(f"   ✓ Loaded womens/medium measurements")
+    print(f"   - Bust: {measurements.get('bust')} cm")
+    print(f"   - Waist: {measurements.get('waist')} cm")
+    
+    # Create PatternGenerator (now uses OpenPattern internally)
+    print("\n2. Creating PatternGenerator...")
+    generator = PatternGenerator(measurements)
+    print(f"   ✓ PatternGenerator created")
+    print(f"   - Uses OpenPattern for professional patterns")
+    
+    # Generate a shirt pattern
+    print("\n3. Generating shirt pattern...")
+    pattern = generator.generate_shirt()
+    print(f"   ✓ Pattern generated successfully")
+    print(f"   - Pattern type: {pattern.get('type')}")
+    print(f"   - Garment: {pattern.get('garment')}")
+    print(f"   - OpenPattern size: {pattern.get('pname')}")
+    
+    # Export to PDF
+    print("\n4. Exporting pattern to PDF...")
+    exporter = PatternExporter("output")
+    files = exporter.export_pattern(
+        pattern,
+        "shirt",
+        "Women's Shirt Pattern",
+        full_pdf=True,
+        tiled_pdf=True,
+        jpg=True
+    )
+    
+    print(f"   ✓ Pattern exported successfully")
+    for file_type, path in files.items():
+        print(f"   - {file_type}: {path}")
+    
+    print("\n" + "=" * 60)
+    print("SUCCESS!")
+    print("=" * 60)
+    print("\nThe PatternGenerator now uses OpenPattern methods directly")
+    print("for professional-grade patterns with proper drafting techniques.")
+    print("\nGenerated files can be found in the 'output' directory.")
+    print("\nFor direct OpenPattern usage, see: simple_bodice.py")
+    print("=" * 60)
 
 if __name__ == "__main__":
     main()
