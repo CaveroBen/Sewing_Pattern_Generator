@@ -1,0 +1,21 @@
+{
+  "chest": 100.0,
+  "waist": 85.0,
+  "hip": 100.0,
+  "shoulder_width": 46.0,
+  "across_back": 40.0,
+  "neck": 39.0,
+  "sleeve_length": 64.0,
+  "arm_length": 84.0,
+  "bicep": 33.0,
+  "wrist": 17.0,
+  "inseam": 81.0,
+  "outseam": 108.0,
+  "thigh": 61.0,
+  "knee": 40.0,
+  "ankle": 23.0,
+  "rise": 27.0,
+  "height": 178.0,
+  "nape_to_waist": 48.0,
+  "waist_to_hip": 20.0
+}
