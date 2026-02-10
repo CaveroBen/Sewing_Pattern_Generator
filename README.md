@@ -1,17 +1,15 @@
 # Sewing Pattern Generator
 
-A Python-based tool for generating bespoke sewing patterns based on custom measurements. This tool creates professional sewing patterns for shirts, vests (waistcoats), trousers, and coats with options for PDF output (full-size or A4-tiled) and JPG thumbnails.
+A simple Python interface to the OpenPattern library for generating professional sewing patterns. This tool creates standard patterns (Bodice, Skirt, and Trousers) and exports them as PDF files.
 
-## Features
+## About OpenPattern
 
-- **Multiple Garment Types**: Generate patterns for shirts, vests, trousers, and coats
-- **Custom Measurements**: Input your own measurements or use default sizing
-- **Multiple Output Formats**:
-  - Full-size PDF for professional printing
-  - A4-tiled PDF for home printing
-  - JPG thumbnails for preview
-- **Default Sizing**: Built-in standard measurements for men's and women's sizes
-- **1:1 Scale**: Patterns are generated at full scale for direct printing
+OpenPattern is a Python library for generating professional sewing patterns based on established patternmaking techniques by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnanno. It provides:
+
+- Professional-grade pattern blocks with accurate drafting
+- Support for standard sizing systems (French, Italian)
+- Multiple drafting styles from renowned pattern makers
+- High-quality pattern generation suitable for professional use
 
 ## Installation
 
@@ -22,369 +20,151 @@ A Python-based tool for generating bespoke sewing patterns based on custom measu
 
 ### Install Dependencies
 
+1. Install the required packages:
 ```bash
 pip install -r requirements.txt
 ```
 
-### Install the Package
-
+2. Install OpenPattern:
 ```bash
-pip install -e .
+pip install git+https://github.com/fmetivier/OpenPattern.git
 ```
-
-This will install the `generate-pattern` command globally.
-
-### Optional: Install OpenPattern (Recommended)
-
-For formal pattern drafting using established patternmaking methodologies, you can install the OpenPattern library:
-
-```bash
-# Clone the OpenPattern repository
-git clone https://github.com/fmetivier/OpenPattern.git
-
-# Navigate to the OpenPattern directory
-cd OpenPattern
-
-# Install OpenPattern
-pip install -e .
-```
-
-**What is OpenPattern?**
-
-OpenPattern is a Python library for generating professional sewing patterns based on established patternmaking techniques by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnano. It provides:
-
-- More sophisticated pattern blocks with professional-grade accuracy
-- Support for standard sizing systems (French, Italian)
-- Advanced features like dart manipulation and pattern grading
-- Scriptable pattern customization
-
-**Note:** OpenPattern is optional. The basic pattern generator works without it, but OpenPattern provides more professional results for serious sewers and tailors.
 
 ## Usage
 
-### Interactive PDF Pattern Generator (New! ⭐)
+### Generate All Pattern Types
 
-The easiest way to generate PDF patterns with an interactive, user-friendly interface:
+Run the main script to generate all three pattern types (Bodice, Skirt, and Trousers):
 
 ```bash
-python generate_pdf_pattern.py
+python generate_patterns.py
 ```
 
-This interactive tool guides you through:
-1. **Gender selection** (mens/womens) with defaults
-2. **Size selection** (34-50) with common sizes shown
-3. **Style selection** (bodice/skirt/trousers) with descriptions
-4. **PDF options**: Full-size and/or A4-segmented output
-5. **Output location**: Choose where to save files
+This will create three PDF files in the `output/` directory:
+- `bodice_W36G.pdf` - Women's bodice (Gilewska style)
+- `skirt_W36C.pdf` - Women's skirt (Chiappetta style)
+- `M44D_basic_trousers.pdf` - Men's trousers (Donnanno style)
 
-**Example session:**
-```
-Select gender (mens/womens) [womens]: womens
-Enter size [38]: 40
-Select style (bodice/skirt/trousers) [bodice]: bodice
-Segment PDF for A4 printing? (Y/n): y
-Generate full-size PDF? (Y/n): y
-Output directory [output]: my_patterns
+### Individual Pattern Examples
+
+You can also run individual pattern examples from the `examples/` directory:
+
+#### Generate a Bodice Pattern
+```bash
+python examples/bodice_example.py
 ```
 
-Press Enter at any prompt to accept the default value shown in [brackets].
+#### Generate a Skirt Pattern
+```bash
+python examples/skirt_example.py
+```
 
-See [PDF_GENERATOR_README.md](PDF_GENERATOR_README.md) for detailed documentation and examples.
+#### Generate a Trousers Pattern
+```bash
+python examples/trousers_example.py
+```
 
-### Simple OpenPattern Usage (Recommended)
+### Use in Your Own Code
 
-If you have OpenPattern installed, you can use it directly with a simple Python script for professional-grade patterns:
+You can import and use the pattern generation functions in your own scripts:
 
 ```python
 import matplotlib.pyplot as plt
 import OpenPattern as OP
 
-# Create a women's bodice pattern using Gilewska method
+# Create a women's bodice pattern
 p = OP.Basic_Bodice(
-    pname="W36G",      # Pattern name (W=Women, 36=size, G=Gilewska)
-    gender='w',        # 'w' for women, 'm' for men
-    style='Gilewska'   # Pattern drafting style
+    pname="W36G",
+    gender='w',
+    style='Gilewska'
 )
 
-# Draw and display the pattern
+# Draw and save as PDF
 p.draw()
+plt.savefig('my_bodice.pdf', format='pdf', bbox_inches='tight')
 plt.show()
 ```
 
-Run the included example:
-```bash
-python examples/simple_bodice.py
-```
+## Pattern Types
 
-This is the simplest way to generate professional bodice patterns with minimal complexity.
+### Basic Bodice
+- **Style**: Gilewska
+- **Parameters**: pname, gender, style
+- **Example**: `OP.Basic_Bodice(pname="W36G", gender='w', style='Gilewska')`
 
-### Command-Line Usage
+### Basic Skirt
+- **Style**: Chiappetta
+- **Parameters**: pname, gender, style, ease, curves
+- **Example**: `OP.Basic_Skirt(pname="W36C", gender='w', style='Chiappetta', ease=8, curves=False)`
 
-Alternatively, use the command-line tool for basic patterns:
+### Basic Trousers
+- **Style**: Donnanno
+- **Parameters**: pname, gender, style, darts
+- **Example**: `OP.Basic_Trousers(pname="M44D", gender='m', style='Donnanno', darts=True)`
 
-Generate a pattern with default measurements:
+## Pattern Naming Convention
 
-```bash
-generate-pattern shirt --gender mens
-```
+Pattern names follow the OpenPattern convention:
+- First letter: Gender ('W' for women, 'M' for men)
+- Number: Size (e.g., 36, 38, 40, 44)
+- Last letter: Style initial (G=Gilewska, C=Chiappetta, D=Donnanno)
 
-### Custom Measurements
+Examples:
+- `W36G` - Women's size 36, Gilewska style
+- `W40C` - Women's size 40, Chiappetta style
+- `M44D` - Men's size 44, Donnanno style
 
-Create a JSON file with your measurements (measurements.json):
+## Customization
 
-```json
-{
-  "chest": 100.0,
-  "waist": 85.0,
-  "hip": 100.0,
-  "shoulder_width": 46.0,
-  "neck": 39.0,
-  "sleeve_length": 64.0,
-  "bicep": 33.0,
-  "wrist": 17.0,
-  "nape_to_waist": 48.0
-}
-```
-
-Generate pattern with custom measurements:
-
-```bash
-generate-pattern shirt --measurements measurements.json
-```
-
-### Generate Different Garments
-
-```bash
-# Shirt
-generate-pattern shirt --gender mens
-
-# Vest/Waistcoat
-generate-pattern vest --gender womens
-
-# Trousers
-generate-pattern trousers --gender mens --tiled
-
-# Coat
-generate-pattern coat --gender womens --output my_coat
-```
-
-### Output Options
-
-```bash
-# Generate A4-tiled PDF for home printing
-generate-pattern shirt --tiled
-
-# Specify output directory
-generate-pattern vest --output my_patterns
-
-# Skip JPG thumbnail
-generate-pattern trousers --no-jpg
-
-# Skip full-size PDF (only generate tiled)
-generate-pattern coat --tiled --no-pdf
-```
-
-### List Required Measurements
-
-To see all available measurements and their descriptions:
-
-```bash
-generate-pattern --list-measurements
-```
-
-## Command-Line Options
-
-```
-usage: generate-pattern [-h] [--gender {mens,womens}] [--size SIZE]
-                       [--measurements MEASUREMENTS] [--output OUTPUT]
-                       [--tiled] [--no-pdf] [--no-jpg]
-                       [--list-measurements]
-                       {shirt,vest,trousers,coat}
-
-Arguments:
-  garment              Type of garment: shirt, vest, trousers, or coat
-
-Options:
-  --gender             Gender for default measurements (mens/womens)
-  --size               Size for default measurements (default: medium)
-  --measurements       Path to JSON file with custom measurements
-  --output             Output directory (default: output)
-  --tiled              Generate A4-tiled PDF for printing
-  --no-pdf             Don't generate full-size PDF
-  --no-jpg             Don't generate JPG thumbnail
-  --list-measurements  List all required measurements
-```
-
-## Measurements Guide
-
-All measurements should be in centimeters (cm).
-
-### Upper Body Measurements
-- **chest/bust**: Circumference at fullest part of chest
-- **waist**: Circumference at natural waistline
-- **hip**: Circumference at fullest part of hips
-- **shoulder_width**: Distance between shoulder points
-- **neck**: Circumference of neck at base
-- **sleeve_length**: Shoulder point to wrist
-- **bicep**: Circumference of upper arm
-- **wrist**: Circumference of wrist
-
-### Lower Body Measurements (for Trousers)
-- **inseam**: Inside leg from crotch to ankle
-- **outseam**: Outside leg from waist to ankle
-- **thigh**: Circumference of thigh
-- **knee**: Circumference of knee
-- **ankle**: Circumference of ankle
-- **rise**: Waist to crotch (front rise)
-
-### Vertical Measurements
-- **height**: Total body height
-- **nape_to_waist**: Back of neck to waistline
-- **waist_to_hip**: Waist to fullest part of hip
-
-## Default Measurements
-
-The tool includes default measurements for:
-- Men's Medium (chest 38-40" / 96.5-101.5 cm)
-- Women's Medium (UK 12-14 / US 8-10)
-
-## Output Files
-
-The tool generates the following files in the output directory:
-
-1. **Full-size PDF** (`{garment}_pattern.pdf`): 
-   - Complete pattern at 1:1 scale
-   - Ready for professional printing
-   - Includes scale reference and grid
-
-2. **Tiled A4 PDF** (`{garment}_pattern_tiled.pdf`):
-   - Pattern split across multiple A4 sheets
-   - Perfect for home printing
-   - Includes alignment marks and tile numbers
-
-3. **JPG Thumbnail** (`{garment}_pattern.jpg`):
-   - Preview image of the pattern
-   - Maximum 1200px dimension
-   - Useful for quick reference
-
-## Examples
-
-### Example 1: Quick Start with Defaults
-
-```bash
-generate-pattern shirt --gender mens
-```
-
-This creates:
-- `output/shirt_pattern.pdf`
-- `output/shirt_pattern.jpg`
-
-### Example 2: Custom Vest with Tiled Output
-
-```bash
-generate-pattern vest --measurements my_measurements.json --tiled --output my_vest
-```
-
-This creates:
-- `my_vest/vest_pattern.pdf`
-- `my_vest/vest_pattern_tiled.pdf`
-- `my_vest/vest_pattern.jpg`
-
-### Example 3: Women's Trousers
-
-```bash
-generate-pattern trousers --gender womens --tiled
-```
-
-## Pattern Drafting Method
-
-This package supports two pattern drafting methods:
-
-### 1. Basic Pattern Generator (Default)
-
-The basic patterns are based on standard pattern drafting techniques with appropriate ease allowances:
-- **Shirts**: 10cm ease for comfortable fit
-- **Vests**: 8cm ease for closer fit
-- **Trousers**: 8cm ease with proper rise allowances
-- **Coats**: 15cm ease to fit over other clothing
-
-**Pattern Features:**
-- **Smooth, realistic curves**: Armholes, necklines, and sleeve caps use cubic spline interpolation for professional appearance
-- **Proper layout**: Pattern pieces are automatically arranged side-by-side with appropriate spacing
-- **Professional markings**: Includes grainline arrows, pattern piece labels, and cutting instructions
-- **Scale reference**: 10cm scale bar and grid for accurate printing
-- **Pattern information**: Seam allowance notes and printing instructions included
-
-These patterns use simplified geometric calculations with professional-grade curve generation, suitable for home sewing projects.
-
-### 2. OpenPattern Generator (Optional)
-
-When OpenPattern is installed, you can use the formal pattern drafting method based on professional patternmaking techniques:
-- Uses established methodologies by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnano
-- Provides more accurate pattern blocks with proper dart placement
-- Supports advanced features like pattern grading and customization
-- Generates patterns compatible with industry standards
-
-To use OpenPattern in your Python scripts:
+You can customize patterns by modifying parameters:
 
 ```python
-from pattern_generator import OpenPatternGenerator, Measurements
+# Women's bodice with different size
+p = OP.Basic_Bodice(pname="W40G", gender='w', style='Gilewska')
 
-# Check if OpenPattern is available
-if OpenPatternGenerator.is_available():
-    measurements = Measurements({"chest": 100, "waist": 85, ...})
-    generator = OpenPatternGenerator(measurements)
-    pattern = generator.generate_shirt()
-else:
-    print("OpenPattern not installed, using basic generator")
+# Skirt with more ease
+p = OP.Basic_Skirt(pname="W38C", gender='w', style='Chiappetta', ease=10, curves=True)
+
+# Women's trousers
+pans = OP.Basic_Trousers(pname="W38D", gender='w', style='Donnanno', darts=True)
 ```
 
-## Technical Details
+## Output
 
-- **Coordinate System**: Cartesian coordinates in centimeters
-- **PDF Resolution**: 100 DPI (sufficient for pattern printing)
-- **Curve Generation**: Cubic spline interpolation for smooth, realistic pattern curves
-- **Layout Algorithm**: Automatic piece positioning with 5cm spacing between pieces
-- **Pattern Markings**: Grainline arrows, labels, cutting instructions, and scale reference
-- **A4 Page Size**: 21.0 × 29.7 cm
-- **Margins**: 2.0 cm on all sides
-- **JPG Quality**: 85% (balanced quality/size)
+All patterns are saved as PDF files that can be:
+- Viewed on screen
+- Printed at full scale for pattern making
+- Edited with PDF software if needed
+
+The patterns include professional-grade details like:
+- Accurate pattern pieces
+- Proper seam allowances
+- Grainlines and notches
+- Pattern labels
+
+## Examples Directory
+
+The `examples/` directory contains individual scripts for each pattern type:
+- `bodice_example.py` - Basic bodice pattern
+- `skirt_example.py` - Basic skirt pattern
+- `trousers_example.py` - Basic trousers pattern
+
+See the [examples/README.md](examples/README.md) for more details.
 
 ## Troubleshooting
 
-### Issue: Command not found
+### OpenPattern Not Installed
+If you get an error about OpenPattern not being installed:
 ```bash
-# Make sure the package is installed
-pip install -e .
-
-# Or run directly with Python
-python -m pattern_generator.cli shirt --gender mens
+pip install git+https://github.com/fmetivier/OpenPattern.git
 ```
 
-### Issue: Invalid measurements
-- Ensure all measurements are in centimeters
-- Check that JSON file is properly formatted
-- Use `--list-measurements` to see required fields
-
-### Issue: PDF too large for printing
-- Use the `--tiled` option to split into A4 sheets
-- Adjust measurements to reduce overall size
-
-## Future Enhancements
-
-Potential improvements for future versions:
-- ✅ Integration with OpenPattern library for more sophisticated patterns (implemented)
-- Command-line option to choose between basic and OpenPattern generators
-- Additional garment types (dresses, skirts, jackets)
-- More size options (S, L, XL, etc.)
-- Pattern grading between sizes
-- Seam allowance options
-- Interactive web interface
-- Pattern customization options (collar styles, sleeve types, etc.)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues or pull requests.
+### Display Issues
+If patterns don't display properly, make sure you have a display configured. On headless systems, use:
+```python
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+```
 
 ## License
 
@@ -392,5 +172,5 @@ This project is open source and available under the MIT License.
 
 ## Acknowledgments
 
-- Pattern drafting principles based on standard tailoring techniques
-- Inspired by the OpenPattern project for sewing pattern generation
+- OpenPattern library by François Métivier
+- Pattern drafting methods by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnanno
