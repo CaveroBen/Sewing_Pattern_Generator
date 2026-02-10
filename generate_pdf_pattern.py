@@ -104,20 +104,20 @@ def get_size_input(gender):
 
 def generate_bodice_pattern(measurements):
     """Generate bodice pattern (shirt)."""
-    generator = PatternGenerator(measurements)
+    generator = OpenPatternGenerator(measurements)
     return generator.generate_shirt()
 
 
 def generate_skirt_pattern(measurements):
     """Generate skirt pattern (using vest as base)."""
-    generator = PatternGenerator(measurements)
+    generator = OpenPatternGenerator(measurements)
     # For now, use vest pattern as a simplified skirt base
     return generator.generate_vest()
 
 
 def generate_trousers_pattern(measurements):
     """Generate trousers pattern."""
-    generator = PatternGenerator(measurements)
+    generator = OpenPatternGenerator(measurements)
     return generator.generate_trousers()
 
 
