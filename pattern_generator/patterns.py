@@ -9,6 +9,13 @@ import os
 
 from .measurements import Measurements
 
+# Try to import OpenPattern if available
+try:
+    import OpenPattern as OP
+    OPENPATTERN_AVAILABLE = True
+except ImportError:
+    OPENPATTERN_AVAILABLE = False
+
 
 class PatternGenerator:
     """
@@ -320,3 +327,158 @@ class PatternGenerator:
             (0, 0),
         ]
         return points
+
+
+class OpenPatternGenerator:
+    """
+    Pattern generator using the OpenPattern library for formal pattern drafting.
+    This class provides a more sophisticated pattern generation method based on
+    established patternmaking methodologies.
+    
+    Requires OpenPattern library to be installed:
+    git clone https://github.com/fmetivier/OpenPattern.git
+    cd OpenPattern
+    python setup.py install
+    """
+    
+    def __init__(self, measurements: Measurements):
+        """
+        Initialize OpenPattern generator with measurements.
+        
+        Args:
+            measurements: Measurements object with body measurements
+            
+        Raises:
+            ImportError: If OpenPattern library is not installed
+        """
+        if not OPENPATTERN_AVAILABLE:
+            raise ImportError(
+                "OpenPattern library is not installed. Please install it using:\n"
+                "  git clone https://github.com/fmetivier/OpenPattern.git\n"
+                "  cd OpenPattern\n"
+                "  python setup.py install"
+            )
+        
+        self.measurements = measurements
+        self.patterns = {}
+        
+    def generate_shirt(self) -> dict:
+        """
+        Generate a formal shirt pattern using OpenPattern's Basic_Bodice.
+        
+        Returns:
+            Dictionary with pattern pieces
+        """
+        # Map our measurements to OpenPattern format
+        # OpenPattern expects measurements in cm
+        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
+        
+        # Create a custom measurement name for OpenPattern
+        # OpenPattern uses specific size names like "W36G" or "M42G"
+        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        pname = f"custom_{int(chest)}"
+        
+        # Generate bodice pattern using OpenPattern
+        pattern = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
+        
+        # Add darts for proper fit
+        pattern.add_bust_dart()
+        pattern.add_waist_dart()
+        
+        # Store the OpenPattern object for later export
+        self.patterns["shirt"] = {
+            "bodice": pattern,
+            "type": "openpattern",
+            "garment": "shirt"
+        }
+        
+        return self.patterns["shirt"]
+    
+    def generate_vest(self) -> dict:
+        """
+        Generate a formal vest pattern using OpenPattern.
+        
+        Returns:
+            Dictionary with pattern pieces
+        """
+        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
+        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        pname = f"custom_{int(chest)}"
+        
+        # Use bodice as base for vest
+        pattern = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
+        pattern.add_bust_dart()
+        
+        self.patterns["vest"] = {
+            "bodice": pattern,
+            "type": "openpattern",
+            "garment": "vest"
+        }
+        
+        return self.patterns["vest"]
+    
+    def generate_trousers(self) -> dict:
+        """
+        Generate formal trouser pattern using OpenPattern.
+        
+        Returns:
+            Dictionary with pattern pieces
+        """
+        waist = self.measurements.get("waist", 85)
+        hip = self.measurements.get("hip", 100)
+        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        pname = f"custom_{int(waist)}"
+        
+        # OpenPattern has trouser patterns
+        # Using basic trouser block
+        try:
+            pattern = OP.Basic_Trouser(pname=pname, gender=gender, style='Gilewska')
+        except (AttributeError, NameError):
+            # If Basic_Trouser is not available, fall back to a simpler approach
+            # Some OpenPattern versions may not have all garment types
+            raise NotImplementedError(
+                "OpenPattern trouser generation not available in this version. "
+                "Use the basic PatternGenerator for trousers."
+            )
+        
+        self.patterns["trousers"] = {
+            "trouser": pattern,
+            "type": "openpattern",
+            "garment": "trousers"
+        }
+        
+        return self.patterns["trousers"]
+    
+    def generate_coat(self) -> dict:
+        """
+        Generate formal coat pattern using OpenPattern.
+        
+        Returns:
+            Dictionary with pattern pieces
+        """
+        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
+        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        pname = f"custom_{int(chest)}"
+        
+        # Use extended bodice for coat
+        pattern = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
+        pattern.add_bust_dart()
+        pattern.add_waist_dart()
+        
+        self.patterns["coat"] = {
+            "bodice": pattern,
+            "type": "openpattern",
+            "garment": "coat"
+        }
+        
+        return self.patterns["coat"]
+    
+    @staticmethod
+    def is_available() -> bool:
+        """
+        Check if OpenPattern library is available.
+        
+        Returns:
+            True if OpenPattern is installed, False otherwise
+        """
+        return OPENPATTERN_AVAILABLE
