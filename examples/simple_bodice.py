@@ -29,7 +29,7 @@ def main():
     print("Generating bodice pattern...")
     print("=" * 50)
     
-    # Creation de l'instance
+    # Creation de l'instance / Create the instance
     # Create a women's bodice pattern using Gilewska method
     p = OP.Basic_Bodice(
         pname="W36G",      # Pattern name (W = Women, 36 = size, G = Gilewska)
@@ -42,7 +42,7 @@ def main():
     print(f"  Gender: Women")
     print(f"  Style: Gilewska")
     
-    # Appel de la fonction de dessin
+    # Appel de la fonction de dessin / Call the drawing function
     # Draw the pattern
     p.draw()
     
