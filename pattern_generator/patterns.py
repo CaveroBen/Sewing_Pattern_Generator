@@ -68,8 +68,8 @@ class PatternGenerator:
             ys_smooth = cs_y(t_smooth)
             
             return list(zip(xs_smooth, ys_smooth))
-        except:
-            # Fallback to linear interpolation if spline fails
+        except (ValueError, RuntimeError, TypeError) as e:
+            # Fallback to original points if spline fails
             return points
     
     @staticmethod
