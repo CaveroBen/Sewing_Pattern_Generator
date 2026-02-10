@@ -36,9 +36,11 @@ def main():
         print(f"  Pattern type: {pattern.get('type', 'unknown')}")
         print(f"  Garment: {pattern.get('garment', 'unknown')}")
         
-        print("\nNote: To export OpenPattern patterns to PDF, use the")
+        print("\nNote: To export OpenPattern patterns to PDF, use")
         print("OpenPattern's built-in export methods:")
         print("  pattern['bodice'].draw({'Pattern': 'Shirt'}, save=True)")
+        print("\nThis will save the pattern as 'Shirt.pdf' in the current directory.")
+        print("The PDF will be at 1:1 scale suitable for professional printing.")
         
     else:
         print("✗ OpenPattern is not installed")

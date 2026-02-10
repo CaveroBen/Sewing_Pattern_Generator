@@ -361,6 +361,34 @@ class OpenPatternGenerator:
         
         self.measurements = measurements
         self.patterns = {}
+    
+    def _get_chest_measurement(self) -> float:
+        """
+        Get chest/bust measurement with appropriate fallback.
+        
+        Returns:
+            Chest measurement in cm (defaults to 100 if not found)
+        """
+        return self.measurements.get("chest", self.measurements.get("bust", 100))
+    
+    def _detect_gender(self) -> str:
+        """
+        Detect gender from measurements for OpenPattern.
+        
+        OpenPattern uses 'w' for women's and 'm' for men's patterns.
+        This is a heuristic based on typical measurement names.
+        
+        Returns:
+            'w' for women's, 'm' for men's
+        """
+        # Women's measurements typically include 'bust' and 'underbust'
+        # Men's measurements typically use 'chest' instead
+        if 'underbust' in self.measurements.measurements:
+            return 'w'
+        elif 'bust' in self.measurements.measurements and 'chest' not in self.measurements.measurements:
+            return 'w'
+        else:
+            return 'm'
         
     def generate_shirt(self) -> dict:
         """
@@ -370,12 +398,11 @@ class OpenPatternGenerator:
             Dictionary with pattern pieces
         """
         # Map our measurements to OpenPattern format
-        # OpenPattern expects measurements in cm
-        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
+        chest = self._get_chest_measurement()
+        gender = self._detect_gender()
         
         # Create a custom measurement name for OpenPattern
         # OpenPattern uses specific size names like "W36G" or "M42G"
-        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
         pname = f"custom_{int(chest)}"
         
         # Generate bodice pattern using OpenPattern
@@ -401,8 +428,8 @@ class OpenPatternGenerator:
         Returns:
             Dictionary with pattern pieces
         """
-        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
-        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        chest = self._get_chest_measurement()
+        gender = self._detect_gender()
         pname = f"custom_{int(chest)}"
         
         # Use bodice as base for vest
@@ -425,8 +452,7 @@ class OpenPatternGenerator:
             Dictionary with pattern pieces
         """
         waist = self.measurements.get("waist", 85)
-        hip = self.measurements.get("hip", 100)
-        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        gender = self._detect_gender()
         pname = f"custom_{int(waist)}"
         
         # OpenPattern has trouser patterns
@@ -456,8 +482,8 @@ class OpenPatternGenerator:
         Returns:
             Dictionary with pattern pieces
         """
-        chest = self.measurements.get("chest", self.measurements.get("bust", 100))
-        gender = 'w' if 'bust' in self.measurements.measurements else 'm'
+        chest = self._get_chest_measurement()
+        gender = self._detect_gender()
         pname = f"custom_{int(chest)}"
         
         # Use extended bodice for coat
