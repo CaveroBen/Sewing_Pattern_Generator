@@ -62,6 +62,35 @@ OpenPattern is a Python library for generating professional sewing patterns base
 
 ## Usage
 
+### Interactive PDF Pattern Generator (New! ⭐)
+
+The easiest way to generate PDF patterns with an interactive, user-friendly interface:
+
+```bash
+python generate_pdf_pattern.py
+```
+
+This interactive tool guides you through:
+1. **Gender selection** (mens/womens) with defaults
+2. **Size selection** (34-50) with common sizes shown
+3. **Style selection** (bodice/skirt/trousers) with descriptions
+4. **PDF options**: Full-size and/or A4-segmented output
+5. **Output location**: Choose where to save files
+
+**Example session:**
+```
+Select gender (mens/womens) [womens]: womens
+Enter size [38]: 40
+Select style (bodice/skirt/trousers) [bodice]: bodice
+Segment PDF for A4 printing? (Y/n): y
+Generate full-size PDF? (Y/n): y
+Output directory [output]: my_patterns
+```
+
+Press Enter at any prompt to accept the default value shown in [brackets].
+
+See [PDF_GENERATOR_README.md](PDF_GENERATOR_README.md) for detailed documentation and examples.
+
 ### Simple OpenPattern Usage (Recommended)
 
 If you have OpenPattern installed, you can use it directly with a simple Python script for professional-grade patterns:
