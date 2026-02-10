@@ -47,9 +47,6 @@ cd OpenPattern
 
 # Install OpenPattern
 python setup.py install
-
-# (Optional) If you need to edit the measurements database
-chmod +w OpenPattern/measurements.db
 ```
 
 **What is OpenPattern?**

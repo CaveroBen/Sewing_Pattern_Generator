@@ -381,14 +381,12 @@ class OpenPatternGenerator:
         Returns:
             'w' for women's, 'm' for men's
         """
-        # Women's measurements typically include 'bust' and 'underbust'
+        # Women's measurements typically include 'bust' and/or 'underbust'
         # Men's measurements typically use 'chest' instead
-        if 'underbust' in self.measurements.measurements:
+        if 'underbust' in self.measurements.measurements or \
+           ('bust' in self.measurements.measurements and 'chest' not in self.measurements.measurements):
             return 'w'
-        elif 'bust' in self.measurements.measurements and 'chest' not in self.measurements.measurements:
-            return 'w'
-        else:
-            return 'm'
+        return 'm'
         
     def generate_shirt(self) -> dict:
         """
