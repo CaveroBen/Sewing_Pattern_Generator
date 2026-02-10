@@ -227,22 +227,28 @@ class PatternExporter:
             # Add title
             plt.suptitle(title, fontsize=16, fontweight='bold')
             
-            # Save to JPG (without quality parameter for matplotlib compatibility)
-            plt.savefig(jpg_path, format='jpg', bbox_inches='tight', dpi=100)
+            # Save to JPG (use 'jpeg' format for compatibility)
+            plt.savefig(jpg_path, format='jpeg', bbox_inches='tight', dpi=100)
             plt.close(fig)
             
             output_files["jpg"] = jpg_path
         
-        # Generate tiled PDF (for now, just create the same full PDF)
-        # A proper tiled implementation would require extracting and segmenting the pattern
+        # Generate tiled PDF
+        # Note: Full tiling of OpenPattern objects is complex and not yet implemented.
+        # This creates a standard PDF that can be printed and manually tiled.
         if tiled_pdf:
             tiled_path = os.path.join(self.output_dir, f"{garment_type}_pattern_tiled.pdf")
             
-            # For simplicity, create the same PDF (tiling OpenPattern objects is complex)
-            # A full implementation would need to extract pattern pieces and tile them
             fig = plt.figure(figsize=(11, 17), dpi=100)
             pattern_obj.draw()
-            plt.suptitle(f"{title} (Tiled)", fontsize=16, fontweight='bold')
+            plt.suptitle(f"{title} (For Tiling)", fontsize=16, fontweight='bold')
+            
+            # Add note about manual tiling
+            fig.text(0.5, 0.02, 
+                    'Note: This PDF can be printed and manually tiled. '
+                    'Automatic A4 tiling not yet supported for OpenPattern objects.',
+                    ha='center', fontsize=8, style='italic', wrap=True)
+            
             plt.savefig(tiled_path, format='pdf', bbox_inches='tight', dpi=100)
             plt.close(fig)
             

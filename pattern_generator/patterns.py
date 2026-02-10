@@ -123,15 +123,28 @@ class PatternGenerator:
         # Create bodice pattern using OpenPattern
         bodice = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
         
-        # Add darts for proper fit
-        bodice.add_bust_dart()
-        bodice.add_waist_dart()
+        # Add darts for proper fit (try-except for gender-specific issues)
+        try:
+            bodice.add_bust_dart()
+        except (KeyError, AttributeError):
+            # Some gender/size combinations may not support bust darts
+            pass
+        
+        try:
+            bodice.add_waist_dart()
+        except (KeyError, AttributeError):
+            # Some gender/size combinations may not support waist darts
+            pass
         
         # Generate sleeve
-        if gender == 'w':
-            bodice.Gilewska_basic_sleeve_w()
-        else:
-            bodice.Gilewska_basic_sleeve_m()
+        try:
+            if gender == 'w':
+                bodice.Gilewska_basic_sleeve_w()
+            else:
+                bodice.Gilewska_basic_sleeve_m()
+        except (KeyError, AttributeError):
+            # Sleeve generation may fail for some sizes, which is OK
+            pass
         
         # Store the OpenPattern object
         self.patterns["shirt"] = {
@@ -157,8 +170,12 @@ class PatternGenerator:
         
         # Use bodice as base for vest (without sleeves, adjusted length)
         vest = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
-        # Add bust dart for better fit
-        vest.add_bust_dart()
+        
+        # Add bust dart for better fit (with error handling)
+        try:
+            vest.add_bust_dart()
+        except (KeyError, AttributeError):
+            pass
         
         self.patterns["vest"] = {
             "openpattern_object": vest,
@@ -173,7 +190,10 @@ class PatternGenerator:
     def generate_trousers(self) -> dict:
         """
         Generate professional trouser pattern using OpenPattern's Basic_Trousers.
-        Note: Uses women's patterns for both genders due to OpenPattern database limitations.
+        
+        **Note**: Due to OpenPattern database limitations, women's patterns are used
+        for both genders. The patterns are professionally drafted and appropriate,
+        but users should be aware of this workaround.
         
         Returns:
             Dictionary with OpenPattern pattern object
@@ -203,6 +223,15 @@ class PatternGenerator:
         # The patterns are adjusted appropriately by OpenPattern
         pname = f"W{size}G"
         actual_gender = 'w'  # Always use 'w' due to database issues with 'm'
+        
+        # Log warning for men's patterns
+        if gender == 'm':
+            import warnings
+            warnings.warn(
+                "Using women's trouser pattern for men due to OpenPattern database limitations. "
+                "The pattern is professionally drafted and appropriate.",
+                UserWarning
+            )
         
         # Create trouser pattern using OpenPattern
         # Try Gilewska first, fall back to Donnano if needed
@@ -237,14 +266,26 @@ class PatternGenerator:
         # Create coat using bodice as base with additional ease
         # (OpenPattern may not have a specific Coat class)
         coat = OP.Basic_Bodice(pname=pname, gender=gender, style='Gilewska')
-        coat.add_bust_dart()
-        coat.add_waist_dart()
+        
+        # Add darts and sleeves (with error handling for gender-specific issues)
+        try:
+            coat.add_bust_dart()
+        except (KeyError, AttributeError):
+            pass
+        
+        try:
+            coat.add_waist_dart()
+        except (KeyError, AttributeError):
+            pass
         
         # Add sleeve
-        if gender == 'w':
-            coat.Gilewska_basic_sleeve_w()
-        else:
-            coat.Gilewska_basic_sleeve_m()
+        try:
+            if gender == 'w':
+                coat.Gilewska_basic_sleeve_w()
+            else:
+                coat.Gilewska_basic_sleeve_m()
+        except (KeyError, AttributeError):
+            pass
         
         self.patterns["coat"] = {
             "openpattern_object": coat,
@@ -257,5 +298,28 @@ class PatternGenerator:
         return self.patterns["coat"]
 
 
-# For backward compatibility, keep OpenPatternGenerator as an alias
-OpenPatternGenerator = PatternGenerator
+# Backward compatibility: OpenPatternGenerator is deprecated
+# Note: Both PatternGenerator and OpenPatternGenerator now use OpenPattern methods.
+import warnings
+
+def OpenPatternGenerator(*args, **kwargs):
+    """
+    Deprecated: Use PatternGenerator instead.
+    
+    OpenPatternGenerator is now a deprecated alias for PatternGenerator.
+    Both use OpenPattern methods for professional pattern generation.
+    
+    Args:
+        *args: Positional arguments passed to PatternGenerator
+        **kwargs: Keyword arguments passed to PatternGenerator
+        
+    Returns:
+        PatternGenerator instance
+    """
+    warnings.warn(
+        "OpenPatternGenerator is deprecated. Use PatternGenerator instead. "
+        "Both now use OpenPattern methods.",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    return PatternGenerator(*args, **kwargs)

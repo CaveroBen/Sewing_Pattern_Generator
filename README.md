@@ -28,7 +28,7 @@ pip install -r requirements.txt
 
 ### Install OpenPattern (Required)
 
-This project now requires the OpenPattern library for professional pattern generation:
+**OpenPattern is required** for this project. The pattern generator uses OpenPattern methods for professional pattern drafting:
 
 ```bash
 # Clone the OpenPattern repository
@@ -40,6 +40,8 @@ cd OpenPattern
 # Install OpenPattern
 pip install -e .
 ```
+
+**Important**: Without OpenPattern, the pattern generator will not work. The project has been rewritten to use OpenPattern's professional methods exclusively.
 
 **What is OpenPattern?**
 
