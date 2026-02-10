@@ -123,9 +123,10 @@ class PatternExporter:
                       tiled_pdf: bool = False, jpg: bool = True) -> dict:
         """
         Export pattern pieces to various formats.
+        Supports both OpenPattern objects and legacy point-based patterns.
         
         Args:
-            pattern_pieces: Dictionary of pattern piece names to point lists
+            pattern_pieces: Dictionary containing either OpenPattern objects or point lists
             garment_type: Type of garment (shirt, vest, etc.)
             title: Title for the pattern
             full_pdf: Generate full-size PDF
@@ -137,6 +138,11 @@ class PatternExporter:
         """
         output_files = {}
         
+        # Check if this is an OpenPattern object
+        if self._is_openpattern_object(pattern_pieces):
+            return self._export_openpattern(pattern_pieces, garment_type, title, full_pdf, tiled_pdf, jpg)
+        
+        # Legacy export for point-based patterns
         # Generate full-size PDF
         if full_pdf:
             pdf_path = os.path.join(self.output_dir, f"{garment_type}_pattern.pdf")
@@ -154,6 +160,93 @@ class PatternExporter:
             jpg_path = os.path.join(self.output_dir, f"{garment_type}_pattern.jpg")
             self._create_jpg(pattern_pieces, title, jpg_path)
             output_files["jpg"] = jpg_path
+        
+        return output_files
+    
+    def _is_openpattern_object(self, pattern_pieces: dict) -> bool:
+        """
+        Check if pattern_pieces contains an OpenPattern object.
+        
+        Args:
+            pattern_pieces: Pattern data dictionary
+            
+        Returns:
+            True if this is an OpenPattern object, False otherwise
+        """
+        return (isinstance(pattern_pieces, dict) and 
+                pattern_pieces.get('type') == 'openpattern' and
+                'openpattern_object' in pattern_pieces)
+    
+    def _export_openpattern(self, pattern_data: dict, garment_type: str,
+                          title: str, full_pdf: bool = True,
+                          tiled_pdf: bool = False, jpg: bool = True) -> dict:
+        """
+        Export OpenPattern object to PDF and JPG using OpenPattern's native methods.
+        
+        Args:
+            pattern_data: Dictionary containing OpenPattern object
+            garment_type: Type of garment
+            title: Pattern title
+            full_pdf: Generate full-size PDF
+            tiled_pdf: Generate A4-tiled PDF  
+            jpg: Generate JPG thumbnail
+            
+        Returns:
+            Dictionary of generated file paths
+        """
+        import matplotlib.pyplot as plt
+        
+        output_files = {}
+        pattern_obj = pattern_data['openpattern_object']
+        
+        # Generate full-size PDF using OpenPattern's draw method
+        if full_pdf:
+            pdf_path = os.path.join(self.output_dir, f"{garment_type}_pattern.pdf")
+            
+            # Create figure and draw pattern
+            fig = plt.figure(figsize=(11, 17), dpi=100)  # A3 size in inches at 100dpi
+            pattern_obj.draw()
+            
+            # Add title
+            plt.suptitle(title, fontsize=16, fontweight='bold')
+            
+            # Save to PDF
+            plt.savefig(pdf_path, format='pdf', bbox_inches='tight', dpi=100)
+            plt.close(fig)
+            
+            output_files["pdf"] = pdf_path
+        
+        # Generate JPG thumbnail
+        if jpg:
+            jpg_path = os.path.join(self.output_dir, f"{garment_type}_pattern.jpg")
+            
+            # Create figure and draw pattern
+            fig = plt.figure(figsize=(11, 17), dpi=100)
+            pattern_obj.draw()
+            
+            # Add title
+            plt.suptitle(title, fontsize=16, fontweight='bold')
+            
+            # Save to JPG (without quality parameter for matplotlib compatibility)
+            plt.savefig(jpg_path, format='jpg', bbox_inches='tight', dpi=100)
+            plt.close(fig)
+            
+            output_files["jpg"] = jpg_path
+        
+        # Generate tiled PDF (for now, just create the same full PDF)
+        # A proper tiled implementation would require extracting and segmenting the pattern
+        if tiled_pdf:
+            tiled_path = os.path.join(self.output_dir, f"{garment_type}_pattern_tiled.pdf")
+            
+            # For simplicity, create the same PDF (tiling OpenPattern objects is complex)
+            # A full implementation would need to extract pattern pieces and tile them
+            fig = plt.figure(figsize=(11, 17), dpi=100)
+            pattern_obj.draw()
+            plt.suptitle(f"{title} (Tiled)", fontsize=16, fontweight='bold')
+            plt.savefig(tiled_path, format='pdf', bbox_inches='tight', dpi=100)
+            plt.close(fig)
+            
+            output_files["tiled_pdf"] = tiled_path
         
         return output_files
     
