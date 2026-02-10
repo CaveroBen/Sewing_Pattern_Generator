@@ -1,17 +1,17 @@
 # Sewing Pattern Generator
 
-A Python-based tool for generating bespoke sewing patterns based on custom measurements. This tool creates professional sewing patterns for shirts, vests (waistcoats), trousers, and coats with options for PDF output (full-size or A4-tiled) and JPG thumbnails.
+A Python-based tool for generating professional sewing patterns using the OpenPattern library. This tool creates high-quality patterns for shirts, vests (waistcoats), trousers, and coats with PDF output (full-size or A4-tiled) and JPG thumbnails.
 
 ## Features
 
+- **Professional Pattern Generation**: Uses OpenPattern library with established patternmaking methodologies (Gilewska, Donnano)
 - **Multiple Garment Types**: Generate patterns for shirts, vests, trousers, and coats
-- **Custom Measurements**: Input your own measurements or use default sizing
+- **Standard Sizing**: Automatically maps measurements to professional sizing (36, 38, 40, 42, 44, 46, 48, 50)
 - **Multiple Output Formats**:
-  - Full-size PDF for professional printing
+  - Full-size PDF for professional printing (1:1 scale)
   - A4-tiled PDF for home printing
   - JPG thumbnails for preview
-- **Default Sizing**: Built-in standard measurements for men's and women's sizes
-- **1:1 Scale**: Patterns are generated at full scale for direct printing
+- **Interactive Tool**: User-friendly command-line interface
 
 ## Installation
 
@@ -26,17 +26,9 @@ A Python-based tool for generating bespoke sewing patterns based on custom measu
 pip install -r requirements.txt
 ```
 
-### Install the Package
+### Install OpenPattern (Required)
 
-```bash
-pip install -e .
-```
-
-This will install the `generate-pattern` command globally.
-
-### Optional: Install OpenPattern (Recommended)
-
-For formal pattern drafting using established patternmaking methodologies, you can install the OpenPattern library:
+This project now requires the OpenPattern library for professional pattern generation:
 
 ```bash
 # Clone the OpenPattern repository
@@ -53,16 +45,23 @@ pip install -e .
 
 OpenPattern is a Python library for generating professional sewing patterns based on established patternmaking techniques by Jacqueline Chiappetta, Theresa Gilewska, and Antonio Donnano. It provides:
 
-- More sophisticated pattern blocks with professional-grade accuracy
-- Support for standard sizing systems (French, Italian)
-- Advanced features like dart manipulation and pattern grading
+- Professional-grade pattern blocks with industry-standard accuracy
+- Support for standard sizing systems (French sizing)
+- Advanced features like dart manipulation and proper curve generation
 - Scriptable pattern customization
+- Established drafting methodologies used by professional tailors
 
-**Note:** OpenPattern is optional. The basic pattern generator works without it, but OpenPattern provides more professional results for serious sewers and tailors.
+### Install the Package
+
+```bash
+pip install -e .
+```
+
+This will install the `generate-pattern` command globally.
 
 ## Usage
 
-### Interactive PDF Pattern Generator (New! ⭐)
+### Interactive PDF Pattern Generator (Recommended! ⭐)
 
 The easiest way to generate PDF patterns with an interactive, user-friendly interface:
 
@@ -91,9 +90,45 @@ Press Enter at any prompt to accept the default value shown in [brackets].
 
 See [PDF_GENERATOR_README.md](PDF_GENERATOR_README.md) for detailed documentation and examples.
 
-### Simple OpenPattern Usage (Recommended)
+### Using PatternGenerator with Python API
 
-If you have OpenPattern installed, you can use it directly with a simple Python script for professional-grade patterns:
+The PatternGenerator now uses OpenPattern methods internally for professional results:
+
+```python
+from pattern_generator import PatternGenerator, DefaultMeasurements
+from pattern_generator.export import PatternExporter
+
+# Load default measurements
+measurements = DefaultMeasurements.get_default("womens", "medium")
+
+# Create generator (uses OpenPattern internally)
+generator = PatternGenerator(measurements)
+
+# Generate patterns
+shirt_pattern = generator.generate_shirt()
+vest_pattern = generator.generate_vest()
+trousers_pattern = generator.generate_trousers()
+
+# Export to PDF
+exporter = PatternExporter("output")
+files = exporter.export_pattern(
+    shirt_pattern,
+    "shirt",
+    "Women's Shirt Pattern",
+    full_pdf=True,
+    tiled_pdf=True,
+    jpg=True
+)
+```
+
+Run the included example:
+```bash
+python examples/openpattern_example.py
+```
+
+### Direct OpenPattern Usage
+
+For direct control, you can use OpenPattern directly:
 
 ```python
 import matplotlib.pyplot as plt
@@ -111,52 +146,36 @@ p.draw()
 plt.show()
 ```
 
-Run the included example:
+Run the simple example:
 ```bash
 python examples/simple_bodice.py
 ```
 
-This is the simplest way to generate professional bodice patterns with minimal complexity.
-
 ### Command-Line Usage
 
-Alternatively, use the command-line tool for basic patterns:
-
-Generate a pattern with default measurements:
+Use the command-line tool for quick pattern generation:
 
 ```bash
-generate-pattern shirt --gender mens
+# Generate a shirt pattern with default measurements
+generate-pattern shirt --gender womens
+
+# Generate different garments
+generate-pattern vest --gender mens
+generate-pattern trousers --gender womens
 ```
 
-### Custom Measurements
+### Size Selection
 
-Create a JSON file with your measurements (measurements.json):
-
-```json
-{
-  "chest": 100.0,
-  "waist": 85.0,
-  "hip": 100.0,
-  "shoulder_width": 46.0,
-  "neck": 39.0,
-  "sleeve_length": 64.0,
-  "bicep": 33.0,
-  "wrist": 17.0,
-  "nape_to_waist": 48.0
-}
-```
-
-Generate pattern with custom measurements:
-
-```bash
-generate-pattern shirt --measurements measurements.json
-```
+The PatternGenerator automatically maps measurements to standard OpenPattern sizes:
+- Sizes: 36, 38, 40, 42, 44, 46, 48, 50
+- Based on chest/bust measurements
+- Uses professional French sizing standards
 
 ### Generate Different Garments
 
 ```bash
 # Shirt
-generate-pattern shirt --gender mens
+generate-pattern shirt --gender womens
 
 # Vest/Waistcoat
 generate-pattern vest --gender womens
