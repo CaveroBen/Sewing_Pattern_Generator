@@ -250,7 +250,14 @@ The basic patterns are based on standard pattern drafting techniques with approp
 - **Trousers**: 8cm ease with proper rise allowances
 - **Coats**: 15cm ease to fit over other clothing
 
-These patterns use simplified geometric calculations suitable for home sewing projects.
+**Pattern Features:**
+- **Smooth, realistic curves**: Armholes, necklines, and sleeve caps use cubic spline interpolation for professional appearance
+- **Proper layout**: Pattern pieces are automatically arranged side-by-side with appropriate spacing
+- **Professional markings**: Includes grainline arrows, pattern piece labels, and cutting instructions
+- **Scale reference**: 10cm scale bar and grid for accurate printing
+- **Pattern information**: Seam allowance notes and printing instructions included
+
+These patterns use simplified geometric calculations with professional-grade curve generation, suitable for home sewing projects.
 
 ### 2. OpenPattern Generator (Optional)
 
@@ -278,8 +285,11 @@ else:
 
 - **Coordinate System**: Cartesian coordinates in centimeters
 - **PDF Resolution**: 100 DPI (sufficient for pattern printing)
+- **Curve Generation**: Cubic spline interpolation for smooth, realistic pattern curves
+- **Layout Algorithm**: Automatic piece positioning with 5cm spacing between pieces
+- **Pattern Markings**: Grainline arrows, labels, cutting instructions, and scale reference
 - **A4 Page Size**: 21.0 × 29.7 cm
-- **Margins**: 1.0 cm on all sides
+- **Margins**: 2.0 cm on all sides
 - **JPG Quality**: 85% (balanced quality/size)
 
 ## Troubleshooting
