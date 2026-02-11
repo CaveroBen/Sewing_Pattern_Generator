@@ -1,0 +1,16 @@
+{
+  "type": "bodice",
+  "name": "MyCustomBodice",
+  "measurements": {
+    "bust": 90,
+    "waist": 70,
+    "hip": 98,
+    "back_width": 35,
+    "front_width": 33,
+    "shoulder_width": 12.5,
+    "armhole_depth": 20.5,
+    "nape_to_waist": 42
+  },
+  "style": "Gilewska",
+  "gender": "w"
+}
