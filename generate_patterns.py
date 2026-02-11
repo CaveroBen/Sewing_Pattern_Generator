@@ -181,6 +181,29 @@ def load_measurements_from_json(json_file):
         sys.exit(1)
 
 
+def ensure_pattern_suffix(name, pattern_type):
+    """
+    Ensure the pattern name has the correct suffix based on pattern type.
+    
+    Args:
+        name: Pattern name
+        pattern_type: Type of pattern ('bodice', 'skirt', or 'trousers')
+        
+    Returns:
+        Pattern name with correct suffix
+    """
+    suffix_map = {
+        'bodice': 'G',
+        'skirt': 'C',
+        'trousers': 'D'
+    }
+    
+    suffix = suffix_map.get(pattern_type)
+    if suffix and not name.endswith(suffix):
+        return f"{name}{suffix}"
+    return name
+
+
 def generate_from_json(json_file, output_dir='output'):
     """
     Generate a pattern from bespoke measurements in a JSON file.
@@ -203,7 +226,7 @@ def generate_from_json(json_file, output_dir='output'):
     # Generate the appropriate pattern type
     # Note: OpenPattern uses standard sizes, but we can still pass the name
     if pattern_type == 'bodice':
-        pname = f"{name}G" if not name.endswith('G') else name
+        pname = ensure_pattern_suffix(name, 'bodice')
         pdf_path = generate_bodice(
             pname=pname,
             gender=gender,
@@ -211,7 +234,7 @@ def generate_from_json(json_file, output_dir='output'):
             output_dir=output_dir
         )
     elif pattern_type == 'skirt':
-        pname = f"{name}C" if not name.endswith('C') else name
+        pname = ensure_pattern_suffix(name, 'skirt')
         ease = data.get('ease', 8)
         curves = data.get('curves', False)
         pdf_path = generate_skirt(
@@ -223,7 +246,7 @@ def generate_from_json(json_file, output_dir='output'):
             output_dir=output_dir
         )
     elif pattern_type == 'trousers':
-        pname = f"{name}D" if not name.endswith('D') else name
+        pname = ensure_pattern_suffix(name, 'trousers')
         darts = data.get('darts', True)
         pdf_path = generate_trousers(
             pname=pname,
@@ -315,7 +338,15 @@ def main():
     # Generate specific pattern type if specified
     if args.type:
         if not args.size:
-            print("Error: --size is required when --type is specified")
+            # Provide helpful error message with examples based on pattern type
+            size_examples = {
+                'bodice': 'W36G, W38G, W40G, M44G',
+                'skirt': 'W6C, W8C, W10C',
+                'trousers': 'M44D, M46D, W38D'
+            }
+            examples = size_examples.get(args.type, 'W36G, W6C, M44D')
+            print(f"Error: --size is required when --type is specified")
+            print(f"Example sizes for {args.type}: {examples}")
             sys.exit(1)
         
         pattern_type = args.type.lower()
