@@ -128,6 +128,9 @@ def generate_trousers(pname="M44D", gender='m', style='Donnanno', darts=True, ou
     print(f"  Style: {style}")
     print(f"  Darts: {darts}")
     
+    # Ensure output directory exists
+    os.makedirs(output_dir, exist_ok=True)
+    
     # Create the trousers pattern
     trousers = OP.Basic_Trousers(
         pname=pname,
@@ -165,9 +168,13 @@ def load_measurements_from_json(json_file):
         with open(json_file, 'r') as f:
             data = json.load(f)
         
-        pattern_type = data.get('type', '').lower()
+        pattern_type = data.get('type', '')
+        if not pattern_type:
+            raise ValueError("Missing required field 'type' in JSON file")
+        
+        pattern_type = pattern_type.lower()
         if pattern_type not in ['bodice', 'skirt', 'trousers']:
-            raise ValueError(f"Invalid pattern type: {pattern_type}. Must be 'bodice', 'skirt', or 'trousers'")
+            raise ValueError(f"Invalid pattern type: '{pattern_type}'. Must be 'bodice', 'skirt', or 'trousers'")
         
         return data
     except FileNotFoundError:
@@ -185,12 +192,17 @@ def ensure_pattern_suffix(name, pattern_type):
     """
     Ensure the pattern name has the correct suffix based on pattern type.
     
+    OpenPattern uses specific suffix conventions to identify pattern styles:
+    - 'G' for Gilewska style (typically bodice patterns)
+    - 'C' for Chiappetta style (typically skirt patterns)
+    - 'D' for Donnanno style (typically trousers patterns)
+    
     Args:
-        name: Pattern name
+        name: Pattern name (e.g., 'W36', 'W8', 'M44')
         pattern_type: Type of pattern ('bodice', 'skirt', or 'trousers')
         
     Returns:
-        Pattern name with correct suffix
+        Pattern name with correct suffix (e.g., 'W36G', 'W8C', 'M44D')
     """
     suffix_map = {
         'bodice': 'G',
