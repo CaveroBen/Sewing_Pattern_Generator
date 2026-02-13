@@ -10,6 +10,12 @@ The Sewing Pattern Generator now supports transforming basic patterns into more 
 
 Transform a basic bodice pattern by adding fitted sleeves. The sleeves are automatically drafted to fit the armhole of the bodice.
 
+**Output Format:** When sleeves are added, the pattern is saved as a 2-page PDF:
+- **Page 1:** Bodice pattern
+- **Page 2:** Sleeve pattern
+
+This allows you to print each pattern piece separately or view them together in a single document.
+
 #### Available Sleeve Styles
 
 1. **Gilewska Sleeves**
@@ -78,7 +84,7 @@ python generate_patterns.py --json your_config.json
 python generate_patterns.py --type bodice --size W38G --add-sleeves
 ```
 
-**Output:** `output/bodice_W38G_with_sleeves.pdf`
+**Output:** `output/bodice_W38G_with_sleeves.pdf` (2-page PDF: bodice + sleeves)
 
 ### Example 2: Women's Bodice with Chiappetta Sleeves
 
@@ -87,7 +93,7 @@ python generate_patterns.py --type bodice --size W38G --add-sleeves
 python generate_patterns.py --type bodice --size W40G --add-sleeves --sleeve-style Chiappetta
 ```
 
-**Output:** `output/bodice_W40G_with_sleeves.pdf`
+**Output:** `output/bodice_W40G_with_sleeves.pdf` (2-page PDF: bodice + sleeves)
 
 ### Example 3: Men's Bodice with Sleeves
 
@@ -96,7 +102,7 @@ python generate_patterns.py --type bodice --size W40G --add-sleeves --sleeve-sty
 python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves
 ```
 
-**Output:** `output/bodice_M44G_with_sleeves.pdf`
+**Output:** `output/bodice_M44G_with_sleeves.pdf` (2-page PDF: bodice + sleeves)
 
 ### Example 4: Using JSON Configuration
 

@@ -139,7 +139,7 @@ The generator now supports transforming basic patterns into more complex designs
 
 #### Adding Sleeves to Bodice Patterns
 
-You can add sleeves to bodice patterns using either command-line arguments or JSON configuration:
+You can add sleeves to bodice patterns using either command-line arguments or JSON configuration. The result is a **2-page PDF** with the bodice on page 1 and sleeves on page 2.
 
 **Command-line:**
 ```bash
@@ -157,7 +157,7 @@ python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves
 - **Gilewska**: Classic fitted sleeve (available for both women and men)
 - **Chiappetta**: Armhole sleeve (best for men's patterns)
 
-The sleeve is automatically fitted to the armhole of the bodice pattern, creating a complete garment pattern ready for use.
+The sleeve is automatically fitted to the armhole of the bodice pattern. Patterns with sleeves are saved as multi-page PDFs allowing you to print each piece separately or view them together.
 
 ### Individual Pattern Examples
 
