@@ -44,10 +44,10 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
     Args:
         pname: Pattern name (e.g., W36G = Women's size 36, Gilewska style)
         gender: 'w' for women, 'm' for men
-        style: Pattern drafting style (e.g., 'Gilewska')
+        style: Pattern drafting style (e.g., 'Gilewska', 'Chiappetta')
         output_dir: Directory to save the PDF
         with_sleeves: Whether to add sleeves to the bodice
-        sleeve_style: Sleeve style ('Gilewska', 'Donnanno', 'Chiappetta'), defaults to bodice style
+        sleeve_style: Sleeve style ('Gilewska', 'Chiappetta'), defaults to bodice style
     """
     print(f"\nGenerating bodice pattern: {pname}")
     print(f"  Gender: {gender}")
@@ -91,7 +91,7 @@ def add_sleeves_to_bodice(bodice, gender, sleeve_style='Gilewska'):
     Args:
         bodice: OP.Basic_Bodice instance
         gender: 'w' for women, 'm' for men
-        sleeve_style: Style of sleeve ('Gilewska', 'Donnanno', 'Chiappetta')
+        sleeve_style: Style of sleeve ('Gilewska', 'Chiappetta')
     
     Returns:
         The modified bodice with sleeves added
@@ -99,6 +99,9 @@ def add_sleeves_to_bodice(bodice, gender, sleeve_style='Gilewska'):
     Note:
         Some sleeve styles may only work with specific bodice styles or genders.
         If a sleeve method is not compatible, it will fall back to Gilewska style.
+        
+        Chiappetta sleeves for women use the men's method as a fallback since
+        OpenPattern's chiappetta_basic_sleeve_m works for both genders.
     """
     print(f"  Adding {sleeve_style} sleeves...")
     
@@ -108,7 +111,7 @@ def add_sleeves_to_bodice(bodice, gender, sleeve_style='Gilewska'):
         ('Gilewska', 'w'): 'Gilewska_basic_sleeve_w',
         ('Gilewska', 'm'): 'Gilewska_basic_sleeve_m',
         ('Chiappetta', 'm'): 'chiappetta_armhole_sleeve_m',
-        ('Chiappetta', 'w'): 'chiappetta_basic_sleeve_m',  # Fallback for women
+        ('Chiappetta', 'w'): 'chiappetta_basic_sleeve_m',  # Uses men's method (works for both)
     }
     
     # Get the appropriate sleeve method
@@ -417,7 +420,7 @@ Examples:
     
     parser.add_argument(
         '--sleeve-style',
-        choices=['Gilewska', 'Donnanno', 'Chiappetta'],
+        choices=['Gilewska', 'Chiappetta'],
         help='Sleeve style (defaults to bodice style)'
     )
     
