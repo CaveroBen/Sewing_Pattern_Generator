@@ -27,6 +27,7 @@ import argparse
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_pdf import PdfPages
 
 try:
     import OpenPattern as OP
@@ -66,17 +67,31 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
     if with_sleeves:
         add_sleeves_to_bodice(p, gender, sleeve_style or style)
     
-    # Draw the pattern
-    p.draw()
-    
     # Save as PDF
     os.makedirs(output_dir, exist_ok=True)
     sleeve_suffix = '_with_sleeves' if with_sleeves else ''
     pdf_path = os.path.join(output_dir, f'bodice_{pname}{sleeve_suffix}.pdf')
-    plt.savefig(pdf_path, format='pdf', bbox_inches='tight')
-    print(f"  Saved: {pdf_path}")
     
-    plt.close()
+    if with_sleeves:
+        # Save multi-page PDF with bodice on page 1 and sleeves on page 2
+        with PdfPages(pdf_path) as pdf:
+            # Page 1: Bodice
+            p.draw_bodice()
+            pdf.savefig(plt.gcf(), bbox_inches='tight')
+            plt.close()
+            
+            # Page 2: Sleeves
+            p.draw_sleeves(save=False)
+            pdf.savefig(plt.gcf(), bbox_inches='tight')
+            plt.close()
+        print(f"  Saved: {pdf_path} (bodice on page 1, sleeves on page 2)")
+    else:
+        # Draw and save just the bodice
+        p.draw()
+        plt.savefig(pdf_path, format='pdf', bbox_inches='tight')
+        print(f"  Saved: {pdf_path}")
+        plt.close()
+    
     return pdf_path
 
 
