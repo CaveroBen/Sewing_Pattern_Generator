@@ -1,0 +1,11 @@
+{
+  "type": "bodice",
+  "name": "M44G",
+  "style": "Gilewska",
+  "gender": "m",
+  "transformations": {
+    "add_sleeves": true,
+    "sleeve_style": "Gilewska"
+  },
+  "note": "Men's bodice with Gilewska sleeves. This demonstrates transformation capabilities for men's patterns."
+}

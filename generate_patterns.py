@@ -37,7 +37,7 @@ except ImportError:
     sys.exit(1)
 
 
-def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='output'):
+def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='output', with_sleeves=False, sleeve_style=None):
     """
     Generate a basic bodice pattern.
     
@@ -46,10 +46,14 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
         gender: 'w' for women, 'm' for men
         style: Pattern drafting style (e.g., 'Gilewska')
         output_dir: Directory to save the PDF
+        with_sleeves: Whether to add sleeves to the bodice
+        sleeve_style: Sleeve style ('Gilewska', 'Donnanno', 'Chiappetta'), defaults to bodice style
     """
     print(f"\nGenerating bodice pattern: {pname}")
     print(f"  Gender: {gender}")
     print(f"  Style: {style}")
+    if with_sleeves:
+        print(f"  With sleeves: {sleeve_style or style}")
     
     # Create the bodice pattern
     p = OP.Basic_Bodice(
@@ -58,17 +62,84 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
         style=style
     )
     
+    # Add sleeves if requested
+    if with_sleeves:
+        add_sleeves_to_bodice(p, gender, sleeve_style or style)
+    
     # Draw the pattern
     p.draw()
     
     # Save as PDF
     os.makedirs(output_dir, exist_ok=True)
-    pdf_path = os.path.join(output_dir, f'bodice_{pname}.pdf')
+    sleeve_suffix = '_with_sleeves' if with_sleeves else ''
+    pdf_path = os.path.join(output_dir, f'bodice_{pname}{sleeve_suffix}.pdf')
     plt.savefig(pdf_path, format='pdf', bbox_inches='tight')
     print(f"  Saved: {pdf_path}")
     
     plt.close()
     return pdf_path
+
+
+def add_sleeves_to_bodice(bodice, gender, sleeve_style='Gilewska'):
+    """
+    Add sleeves to an existing bodice pattern.
+    
+    This function transforms a basic bodice by adding sleeves according to
+    the specified style. The sleeve is automatically fitted to the armhole
+    of the bodice.
+    
+    Args:
+        bodice: OP.Basic_Bodice instance
+        gender: 'w' for women, 'm' for men
+        sleeve_style: Style of sleeve ('Gilewska', 'Donnanno', 'Chiappetta')
+    
+    Returns:
+        The modified bodice with sleeves added
+    
+    Note:
+        Some sleeve styles may only work with specific bodice styles or genders.
+        If a sleeve method is not compatible, it will fall back to Gilewska style.
+    """
+    print(f"  Adding {sleeve_style} sleeves...")
+    
+    # Map of sleeve methods for each style and gender
+    # Note: Not all combinations are available in OpenPattern
+    sleeve_methods = {
+        ('Gilewska', 'w'): 'Gilewska_basic_sleeve_w',
+        ('Gilewska', 'm'): 'Gilewska_basic_sleeve_m',
+        ('Chiappetta', 'm'): 'chiappetta_armhole_sleeve_m',
+        ('Chiappetta', 'w'): 'chiappetta_basic_sleeve_m',  # Fallback for women
+    }
+    
+    # Get the appropriate sleeve method
+    method_name = sleeve_methods.get((sleeve_style, gender))
+    
+    if not method_name:
+        print(f"  Warning: {sleeve_style} sleeves not available for gender '{gender}', using Gilewska")
+        method_name = sleeve_methods.get(('Gilewska', gender))
+    
+    if hasattr(bodice, method_name):
+        try:
+            method = getattr(bodice, method_name)
+            method()
+            print(f"  Sleeves added successfully using {method_name}")
+        except Exception as e:
+            print(f"  Warning: Failed to add {sleeve_style} sleeves: {e}")
+            # Try fallback to Gilewska
+            if sleeve_style != 'Gilewska':
+                print(f"  Trying Gilewska sleeves as fallback...")
+                fallback_method = sleeve_methods.get(('Gilewska', gender))
+                if fallback_method and hasattr(bodice, fallback_method):
+                    try:
+                        method = getattr(bodice, fallback_method)
+                        method()
+                        print(f"  Sleeves added using fallback: {fallback_method}")
+                    except Exception as e2:
+                        print(f"  Error: Could not add sleeves: {e2}")
+    else:
+        print(f"  Warning: Method {method_name} not found on bodice")
+    
+    return bodice
 
 
 def generate_skirt(pname="W6C", gender='G', style='Chiappetta', ease=8, curves=False, output_dir='output'):
@@ -235,15 +306,25 @@ def generate_from_json(json_file, output_dir='output'):
     print(f"Pattern type: {pattern_type}")
     print(f"Pattern name: {name}")
     
+    # Check for transformations
+    transformations = data.get('transformations', {})
+    
     # Generate the appropriate pattern type
     # Note: OpenPattern uses standard sizes, but we can still pass the name
     if pattern_type == 'bodice':
         pname = ensure_pattern_suffix(name, 'bodice')
+        
+        # Check for sleeve transformation
+        with_sleeves = transformations.get('add_sleeves', False)
+        sleeve_style = transformations.get('sleeve_style', style)
+        
         pdf_path = generate_bodice(
             pname=pname,
             gender=gender,
             style=style,
-            output_dir=output_dir
+            output_dir=output_dir,
+            with_sleeves=with_sleeves,
+            sleeve_style=sleeve_style
         )
     elif pattern_type == 'skirt':
         pname = ensure_pattern_suffix(name, 'skirt')
@@ -284,6 +365,9 @@ Examples:
   # Generate a specific bodice pattern
   python generate_patterns.py --type bodice --size W36G
   
+  # Generate a bodice with sleeves
+  python generate_patterns.py --type bodice --size W36G --add-sleeves
+  
   # Generate a skirt pattern
   python generate_patterns.py --type skirt --size W6C
   
@@ -323,6 +407,18 @@ Examples:
         '--gender',
         choices=['w', 'm', 'G'],
         help='Gender code: w=women, m=men, G=general (for skirts)'
+    )
+    
+    parser.add_argument(
+        '--add-sleeves',
+        action='store_true',
+        help='Add sleeves to bodice pattern (only for bodice type)'
+    )
+    
+    parser.add_argument(
+        '--sleeve-style',
+        choices=['Gilewska', 'Donnanno', 'Chiappetta'],
+        help='Sleeve style (defaults to bodice style)'
     )
     
     return parser.parse_args()
@@ -368,11 +464,23 @@ def main():
         if pattern_type == 'bodice':
             style = args.style or 'Gilewska'
             gender = args.gender or 'w'
+            
+            # Check for sleeve transformation
+            with_sleeves = args.add_sleeves
+            sleeve_style = args.sleeve_style or style
+            
+            # Warn if sleeve options used without bodice
+            if with_sleeves and pattern_type != 'bodice':
+                print("Warning: --add-sleeves only applies to bodice patterns")
+                with_sleeves = False
+            
             generate_bodice(
                 pname=size,
                 gender=gender,
                 style=style,
-                output_dir=output_dir
+                output_dir=output_dir,
+                with_sleeves=with_sleeves,
+                sleeve_style=sleeve_style
             )
         elif pattern_type == 'skirt':
             style = args.style or 'Chiappetta'

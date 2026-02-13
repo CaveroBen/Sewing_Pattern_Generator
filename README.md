@@ -86,6 +86,20 @@ Example JSON for bodice:
 }
 ```
 
+Example JSON for bodice with sleeves:
+```json
+{
+  "type": "bodice",
+  "name": "W36G",
+  "style": "Gilewska",
+  "gender": "w",
+  "transformations": {
+    "add_sleeves": true,
+    "sleeve_style": "Gilewska"
+  }
+}
+```
+
 Example JSON for skirt:
 ```json
 {
@@ -112,10 +126,38 @@ Example JSON for trousers:
 **Note:** OpenPattern uses predefined standard sizing tables internally. The `name` field in JSON must match a valid size code (e.g., W36G, W38G, W40G for women's bodices; W6C, W8C, W10C for skirts; M44D, M46D for men's trousers).
 
 Sample JSON files are provided:
-- `test_measurements.json` - Bodice configuration
+- `test_measurements.json` - Basic bodice configuration
+- `test_bodice_with_sleeves.json` - Bodice with sleeves transformation
+- `test_mens_bodice_sleeves.json` - Men's bodice with sleeves
 - `test_skirt.json` - Skirt configuration
 - `test_trousers.json` - Trousers configuration
 - `measurements.json` - Reference file with standard measurements documentation
+
+### Pattern Transformations
+
+The generator now supports transforming basic patterns into more complex designs. Currently supported transformations:
+
+#### Adding Sleeves to Bodice Patterns
+
+You can add sleeves to bodice patterns using either command-line arguments or JSON configuration:
+
+**Command-line:**
+```bash
+# Generate bodice with sleeves (same style as bodice)
+python generate_patterns.py --type bodice --size W36G --add-sleeves
+
+# Generate bodice with specific sleeve style
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-style Chiappetta
+
+# Generate men's bodice with sleeves
+python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves
+```
+
+**Available sleeve styles:**
+- **Gilewska**: Classic fitted sleeve (available for both women and men)
+- **Chiappetta**: Armhole sleeve (best for men's patterns)
+
+The sleeve is automatically fitted to the armhole of the bodice pattern, creating a complete garment pattern ready for use.
 
 ### Individual Pattern Examples
 
