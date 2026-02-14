@@ -1,0 +1,12 @@
+{
+  "type": "bodice",
+  "name": "W36G",
+  "style": "Gilewska",
+  "gender": "w",
+  "transformations": {
+    "add_sleeves": true,
+    "sleeve_style": "Gilewska",
+    "sleeve_pieces": 2
+  },
+  "note": "Two-piece sleeve for better fit and shaping. Upper and under sleeve pieces allow for more precise fitting around the arm."
+}

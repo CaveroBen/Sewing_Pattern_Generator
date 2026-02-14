@@ -1,0 +1,7 @@
+{
+  "type": "bodice",
+  "name": "W38G",
+  "note": "OpenPattern uses standard sizing tables internally. The 'name' field must match a predefined size like W36G, W38G, W40G for women or M44G, M46G for men.",
+  "style": "Gilewska",
+  "gender": "w"
+}

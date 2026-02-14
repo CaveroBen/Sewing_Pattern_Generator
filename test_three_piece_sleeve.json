@@ -1,0 +1,12 @@
+{
+  "type": "bodice",
+  "name": "W38G",
+  "style": "Gilewska",
+  "gender": "w",
+  "transformations": {
+    "add_sleeves": true,
+    "sleeve_style": "Gilewska",
+    "sleeve_pieces": 3
+  },
+  "note": "Three-piece Chanel-style sleeve with separate cuff piece. Allows for better wrist shaping and positioning of button/fastening elements on top of the wrist."
+}

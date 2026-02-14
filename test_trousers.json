@@ -1,0 +1,8 @@
+{
+  "type": "trousers",
+  "name": "M46D",
+  "note": "OpenPattern uses standard sizing tables. Valid sizes include M44D, M46D, W38D, etc.",
+  "style": "Donnanno",
+  "gender": "m",
+  "darts": true
+}

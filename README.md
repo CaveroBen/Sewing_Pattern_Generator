@@ -45,6 +45,136 @@ This will create three PDF files in the `output/` directory:
 - `skirt_W6C.pdf` - Women's skirt (Chiappetta style)
 - `Donnanno_Basic_Trousers_M44D_FullSize.pdf` - Men's trousers (Donnanno style)
 
+### Generate Specific Pattern Type and Size
+
+You can now use command-line selectors to generate specific patterns:
+
+```bash
+# Generate a specific bodice size
+python generate_patterns.py --type bodice --size W38G
+
+# Generate a specific skirt size
+python generate_patterns.py --type skirt --size W10C
+
+# Generate specific trousers
+python generate_patterns.py --type trousers --size M46D
+```
+
+Available options:
+- `--type`: Choose pattern type (`bodice`, `skirt`, or `trousers`)
+- `--size`: Specify the pattern size (e.g., `W36G`, `W40G`, `M44D`)
+- `--style`: Override default style (e.g., `Gilewska`, `Chiappetta`, `Donnanno`)
+- `--gender`: Specify gender code (`w` for women, `m` for men, `G` for general/skirts)
+- `--output`: Set custom output directory (default: `output`)
+
+### Generate from JSON with Bespoke Measurements
+
+You can use JSON files to define custom pattern configurations:
+
+```bash
+# Generate pattern from JSON file
+python generate_patterns.py --json test_measurements.json
+```
+
+Example JSON for bodice:
+```json
+{
+  "type": "bodice",
+  "name": "W38G",
+  "style": "Gilewska",
+  "gender": "w"
+}
+```
+
+Example JSON for bodice with sleeves:
+```json
+{
+  "type": "bodice",
+  "name": "W36G",
+  "style": "Gilewska",
+  "gender": "w",
+  "transformations": {
+    "add_sleeves": true,
+    "sleeve_style": "Gilewska"
+  }
+}
+```
+
+Example JSON for skirt:
+```json
+{
+  "type": "skirt",
+  "name": "W8C",
+  "style": "Chiappetta",
+  "gender": "G",
+  "ease": 10,
+  "curves": true
+}
+```
+
+Example JSON for trousers:
+```json
+{
+  "type": "trousers",
+  "name": "M46D",
+  "style": "Donnanno",
+  "gender": "m",
+  "darts": true
+}
+```
+
+**Note:** OpenPattern uses predefined standard sizing tables internally. The `name` field in JSON must match a valid size code (e.g., W36G, W38G, W40G for women's bodices; W6C, W8C, W10C for skirts; M44D, M46D for men's trousers).
+
+Sample JSON files are provided:
+- `test_measurements.json` - Basic bodice configuration
+- `test_bodice_with_sleeves.json` - Bodice with sleeves transformation
+- `test_mens_bodice_sleeves.json` - Men's bodice with sleeves
+- `test_skirt.json` - Skirt configuration
+- `test_trousers.json` - Trousers configuration
+- `measurements.json` - Reference file with standard measurements documentation
+
+### Pattern Transformations
+
+The generator now supports transforming basic patterns into more complex designs. Currently supported transformations:
+
+#### Adding Sleeves to Bodice Patterns
+
+You can add sleeves to bodice patterns using either command-line arguments or JSON configuration. Sleeves can be generated as single-piece, two-piece, or three-piece patterns.
+
+**Command-line:**
+```bash
+# Generate bodice with basic single-piece sleeves
+python generate_patterns.py --type bodice --size W36G --add-sleeves
+
+# Generate bodice with two-piece sleeves for better fit
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-pieces 2
+
+# Generate bodice with three-piece Chanel-style sleeves
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-pieces 3
+
+# Generate with specific sleeve style
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-style Chiappetta
+
+# Generate men's bodice with two-piece sleeves
+python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves --sleeve-pieces 2
+```
+
+**Available sleeve options:**
+- **Sleeve styles:**
+  - **Gilewska**: Classic fitted sleeve (available for both women and men)
+  - **Chiappetta**: Armhole sleeve (best for men's patterns)
+  
+- **Sleeve pieces:**
+  - **1 piece (default)**: Basic single-piece sleeve
+  - **2 pieces**: Upper and under sleeve for better fit and shaping
+  - **3 pieces**: Chanel-style with separate cuff piece for precise wrist shaping
+
+**Multi-piece sleeve benefits:**
+- **Two-piece sleeves**: Better fit around the arm, easier adjustments, more professional appearance
+- **Three-piece sleeves**: All benefits of two-piece plus precise wrist shaping, ideal for Chanel jackets, allows button placement on top of wrist
+
+The sleeve is automatically fitted to the armhole of the bodice pattern. Patterns with sleeves are saved as multi-page PDFs allowing you to print each piece separately or view them together.
+
 ### Individual Pattern Examples
 
 You can also run individual pattern examples from the `examples/` directory:

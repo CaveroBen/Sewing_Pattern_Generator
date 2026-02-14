@@ -1,0 +1,163 @@
+{
+  "description": "Standard measurements for sewing pattern generation",
+  "measurements": {
+    "bodice": {
+      "W36": {
+        "bust": 88,
+        "waist": 68,
+        "hip": 96,
+        "back_width": 34.5,
+        "front_width": 32.5,
+        "shoulder_width": 12,
+        "armhole_depth": 20,
+        "nape_to_waist": 42,
+        "style": "Gilewska",
+        "gender": "w"
+      },
+      "W38": {
+        "bust": 92,
+        "waist": 72,
+        "hip": 100,
+        "back_width": 35.5,
+        "front_width": 33.5,
+        "shoulder_width": 12.5,
+        "armhole_depth": 20.5,
+        "nape_to_waist": 42.5,
+        "style": "Gilewska",
+        "gender": "w"
+      },
+      "W40": {
+        "bust": 96,
+        "waist": 76,
+        "hip": 104,
+        "back_width": 36.5,
+        "front_width": 34.5,
+        "shoulder_width": 13,
+        "armhole_depth": 21,
+        "nape_to_waist": 43,
+        "style": "Gilewska",
+        "gender": "w"
+      },
+      "M44": {
+        "chest": 96,
+        "waist": 84,
+        "hip": 100,
+        "back_width": 38,
+        "front_width": 36,
+        "shoulder_width": 14,
+        "armhole_depth": 22,
+        "nape_to_waist": 44,
+        "style": "Gilewska",
+        "gender": "m"
+      }
+    },
+    "skirt": {
+      "W6": {
+        "waist": 68,
+        "hip": 96,
+        "skirt_length": 60,
+        "ease": 8,
+        "curves": false,
+        "style": "Chiappetta",
+        "gender": "G"
+      },
+      "W8": {
+        "waist": 72,
+        "hip": 100,
+        "skirt_length": 60,
+        "ease": 8,
+        "curves": false,
+        "style": "Chiappetta",
+        "gender": "G"
+      },
+      "W10": {
+        "waist": 76,
+        "hip": 104,
+        "skirt_length": 60,
+        "ease": 8,
+        "curves": false,
+        "style": "Chiappetta",
+        "gender": "G"
+      }
+    },
+    "trousers": {
+      "M44": {
+        "waist": 84,
+        "hip": 100,
+        "inseam": 81,
+        "outseam": 108,
+        "rise": 27,
+        "knee": 42,
+        "ankle": 38,
+        "darts": true,
+        "style": "Donnanno",
+        "gender": "m"
+      },
+      "M46": {
+        "waist": 88,
+        "hip": 104,
+        "inseam": 81,
+        "outseam": 108,
+        "rise": 27.5,
+        "knee": 43,
+        "ankle": 39,
+        "darts": true,
+        "style": "Donnanno",
+        "gender": "m"
+      },
+      "W38": {
+        "waist": 72,
+        "hip": 100,
+        "inseam": 78,
+        "outseam": 104,
+        "rise": 26,
+        "knee": 38,
+        "ankle": 34,
+        "darts": true,
+        "style": "Donnanno",
+        "gender": "w"
+      }
+    }
+  },
+  "bespoke": {
+    "example_bodice": {
+      "type": "bodice",
+      "name": "Custom_Bodice",
+      "bust": 94,
+      "waist": 74,
+      "hip": 102,
+      "back_width": 36,
+      "front_width": 34,
+      "shoulder_width": 12.5,
+      "armhole_depth": 20.5,
+      "nape_to_waist": 42.5,
+      "style": "Gilewska",
+      "gender": "w"
+    },
+    "example_skirt": {
+      "type": "skirt",
+      "name": "Custom_Skirt",
+      "waist": 74,
+      "hip": 102,
+      "skirt_length": 65,
+      "ease": 10,
+      "curves": true,
+      "style": "Chiappetta",
+      "gender": "G"
+    },
+    "example_trousers": {
+      "type": "trousers",
+      "name": "Custom_Trousers",
+      "waist": 86,
+      "hip": 102,
+      "inseam": 80,
+      "outseam": 106,
+      "rise": 27,
+      "knee": 40,
+      "ankle": 36,
+      "darts": true,
+      "style": "Donnanno",
+      "gender": "m"
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "skirt",
+  "name": "W8C",
+  "note": "OpenPattern uses standard sizing tables. Valid sizes include W6C, W8C, W10C, etc. Gender code 'G' is required by OpenPattern for skirt patterns (not 'w' or 'm').",
+  "style": "Chiappetta",
+  "gender": "G",
+  "ease": 10,
+  "curves": true
+}
