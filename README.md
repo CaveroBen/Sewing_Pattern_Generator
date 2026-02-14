@@ -139,23 +139,39 @@ The generator now supports transforming basic patterns into more complex designs
 
 #### Adding Sleeves to Bodice Patterns
 
-You can add sleeves to bodice patterns using either command-line arguments or JSON configuration. The result is a **2-page PDF** with the bodice on page 1 and sleeves on page 2.
+You can add sleeves to bodice patterns using either command-line arguments or JSON configuration. Sleeves can be generated as single-piece, two-piece, or three-piece patterns.
 
 **Command-line:**
 ```bash
-# Generate bodice with sleeves (same style as bodice)
+# Generate bodice with basic single-piece sleeves
 python generate_patterns.py --type bodice --size W36G --add-sleeves
 
-# Generate bodice with specific sleeve style
+# Generate bodice with two-piece sleeves for better fit
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-pieces 2
+
+# Generate bodice with three-piece Chanel-style sleeves
+python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-pieces 3
+
+# Generate with specific sleeve style
 python generate_patterns.py --type bodice --size W36G --add-sleeves --sleeve-style Chiappetta
 
-# Generate men's bodice with sleeves
-python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves
+# Generate men's bodice with two-piece sleeves
+python generate_patterns.py --type bodice --size M44G --gender m --add-sleeves --sleeve-pieces 2
 ```
 
-**Available sleeve styles:**
-- **Gilewska**: Classic fitted sleeve (available for both women and men)
-- **Chiappetta**: Armhole sleeve (best for men's patterns)
+**Available sleeve options:**
+- **Sleeve styles:**
+  - **Gilewska**: Classic fitted sleeve (available for both women and men)
+  - **Chiappetta**: Armhole sleeve (best for men's patterns)
+  
+- **Sleeve pieces:**
+  - **1 piece (default)**: Basic single-piece sleeve
+  - **2 pieces**: Upper and under sleeve for better fit and shaping
+  - **3 pieces**: Chanel-style with separate cuff piece for precise wrist shaping
+
+**Multi-piece sleeve benefits:**
+- **Two-piece sleeves**: Better fit around the arm, easier adjustments, more professional appearance
+- **Three-piece sleeves**: All benefits of two-piece plus precise wrist shaping, ideal for Chanel jackets, allows button placement on top of wrist
 
 The sleeve is automatically fitted to the armhole of the bodice pattern. Patterns with sleeves are saved as multi-page PDFs allowing you to print each piece separately or view them together.
 
