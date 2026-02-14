@@ -76,31 +76,78 @@ def split_sleeve_into_pieces(sleeve_vertices, num_pieces=2):
 
 def _create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height):
     """
-    Create a two-piece sleeve: upper sleeve and under sleeve.
-    The split follows the centerline of the sleeve cap down to the cuff.
+    Create a two-piece sleeve following proper tailoring standards.
+    
+    In a proper two-piece sleeve:
+    - Upper sleeve (oversleeve): covers the back/outer arm, wider at sleeve cap
+    - Under sleeve (undersleeve): covers the front/inner arm, narrower at cap
+    
+    The split runs along the elbow line from back-center of cap through the 
+    elbow to back-center of cuff, creating an anatomically correct division.
     """
     pieces = []
     
-    # Find points at the top (sleeve cap)
-    cap_indices = np.where(vertices[:, 1] >= (top_y - sleeve_height * 0.1))[0]
+    # Analyze sleeve structure to find front and back edges
+    # The sleeve vertices typically go around the perimeter
+    # We need to identify which side is front (narrower at cap) and which is back (wider at cap)
     
-    # Find the approximate center x-coordinate at various heights
+    # Find the rightmost and leftmost edges at different heights
+    # At the cap, back side is typically wider (further from center)
+    cap_region = vertices[vertices[:, 1] >= (top_y - sleeve_height * 0.15)]
+    mid_region = vertices[(vertices[:, 1] >= (bottom_y + sleeve_height * 0.4)) & 
+                          (vertices[:, 1] <= (bottom_y + sleeve_height * 0.6))]
+    cuff_region = vertices[vertices[:, 1] <= (bottom_y + sleeve_height * 0.15)]
+    
+    # Determine which side is front and which is back
+    # Back side (right in standard orientation) is typically wider at cap
+    if len(cap_region) > 0:
+        right_cap_extent = np.max(cap_region[:, 0])
+        left_cap_extent = np.min(cap_region[:, 0])
+        # If right side extends further, it's the back
+        back_is_right = abs(right_cap_extent) > abs(left_cap_extent)
+    else:
+        back_is_right = True  # Default assumption
+    
+    # Create split line that runs from back of cap through elbow to back of cuff
+    # This split should be offset toward the back (typically 55-60% back, 40-45% front)
     split_points = []
-    for height_ratio in np.linspace(1.0, 0, 20):
+    
+    for height_ratio in np.linspace(1.0, 0, 25):
         y_level = bottom_y + sleeve_height * height_ratio
-        nearby_points = vertices[np.abs(vertices[:, 1] - y_level) < sleeve_height * 0.05]
+        
+        # Find points at this height
+        nearby_points = vertices[np.abs(vertices[:, 1] - y_level) < sleeve_height * 0.04]
+        
         if len(nearby_points) > 0:
-            x_center = nearby_points[:, 0].mean()
-            split_points.append([x_center, y_level])
+            x_min = np.min(nearby_points[:, 0])
+            x_max = np.max(nearby_points[:, 0])
+            
+            # At cap: split closer to back edge (60% toward back)
+            # At mid: split closer to center but still back-biased (55%)
+            # At cuff: split at or near center (50%)
+            if height_ratio > 0.7:  # Cap region
+                back_bias = 0.60
+            elif height_ratio > 0.3:  # Mid region (elbow)
+                back_bias = 0.55
+            else:  # Cuff region
+                back_bias = 0.50
+            
+            if back_is_right:
+                # Back is on the right, so split should be right of center
+                split_x = x_min + (x_max - x_min) * back_bias
+            else:
+                # Back is on the left, so split should be left of center
+                split_x = x_max - (x_max - x_min) * back_bias
+            
+            split_points.append([split_x, y_level])
     
     split_line = np.array(split_points)
     
-    # Separate vertices into left (upper) and right (under) pieces
-    # Upper sleeve typically has the back/upper part
+    # Separate vertices into upper (back) and under (front) pieces
+    # The upper sleeve should include the back portion (wider at cap)
     upper_vertices = []
     under_vertices = []
     
-    # Find vertices to the left and right of the split line
     for v in vertices:
         x, y = v
         # Find closest point on split line
@@ -108,25 +155,38 @@ def _create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height):
         closest_idx = distances.argmin()
         split_x = split_line[closest_idx, 0]
         
-        if x <= split_x:
-            upper_vertices.append(v)
+        # Determine which piece this vertex belongs to
+        if back_is_right:
+            # Back (upper) is on the right side
+            if x >= split_x:
+                upper_vertices.append(v)
+            else:
+                under_vertices.append(v)
         else:
-            under_vertices.append(v)
+            # Back (upper) is on the left side
+            if x <= split_x:
+                upper_vertices.append(v)
+            else:
+                under_vertices.append(v)
     
-    # Add split line to both pieces
-    upper_vertices.extend(split_line[::-1])  # Add split line in reverse
-    under_vertices.extend(split_line)  # Add split line
+    # Add split line to both pieces to create the seam
+    if back_is_right:
+        upper_vertices.extend(split_line[::-1])  # Add in reverse for proper polygon
+        under_vertices.extend(split_line)
+    else:
+        upper_vertices.extend(split_line)
+        under_vertices.extend(split_line[::-1])
     
     pieces.append({
-        'name': 'Upper Sleeve',
+        'name': 'Upper Sleeve (Oversleeve)',
         'vertices': np.array(upper_vertices),
-        'description': 'Upper/back sleeve piece'
+        'description': 'Back/outer sleeve piece - wider at cap for back of arm'
     })
     
     pieces.append({
-        'name': 'Under Sleeve',
+        'name': 'Under Sleeve (Undersleeve)',
         'vertices': np.array(under_vertices),
-        'description': 'Under/front sleeve piece'
+        'description': 'Front/inner sleeve piece - narrower at cap, wider at forearm'
     })
     
     return pieces
