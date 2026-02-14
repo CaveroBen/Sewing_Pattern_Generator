@@ -24,10 +24,13 @@ import os
 import sys
 import json
 import argparse
+import numpy as np
 import matplotlib
 matplotlib.use('Agg')  # Use non-interactive backend for headless systems
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
+from matplotlib.patches import Polygon
+from matplotlib.lines import Line2D
 
 try:
     import OpenPattern as OP
@@ -38,7 +41,208 @@ except ImportError:
     sys.exit(1)
 
 
-def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='output', with_sleeves=False, sleeve_style=None):
+def split_sleeve_into_pieces(sleeve_vertices, num_pieces=2):
+    """
+    Split a basic sleeve pattern into multiple pieces for better fit and shaping.
+    
+    Args:
+        sleeve_vertices: List of [x, y] coordinates defining the sleeve outline
+        num_pieces: Number of pieces to split into (2 or 3)
+    
+    Returns:
+        List of piece definitions, each containing vertices and metadata
+    """
+    if not sleeve_vertices or len(sleeve_vertices) < 10:
+        raise ValueError("Invalid sleeve vertices")
+    
+    vertices = np.array([[float(v[0]), float(v[1])] for v in sleeve_vertices])
+    
+    # Find the approximate center line of the sleeve (vertical split)
+    x_coords = vertices[:, 0]
+    y_coords = vertices[:, 1]
+    
+    # Find top (cap) and bottom (cuff) of sleeve
+    top_y = y_coords.max()
+    bottom_y = y_coords.min()
+    sleeve_height = top_y - bottom_y
+    
+    if num_pieces == 2:
+        return _create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height)
+    elif num_pieces == 3:
+        return _create_three_piece_sleeve(vertices, top_y, bottom_y, sleeve_height)
+    else:
+        raise ValueError(f"Unsupported number of pieces: {num_pieces}. Must be 2 or 3.")
+
+
+def _create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height):
+    """
+    Create a two-piece sleeve: upper sleeve and under sleeve.
+    The split follows the centerline of the sleeve cap down to the cuff.
+    """
+    pieces = []
+    
+    # Find points at the top (sleeve cap)
+    cap_indices = np.where(vertices[:, 1] >= (top_y - sleeve_height * 0.1))[0]
+    
+    # Find the approximate center x-coordinate at various heights
+    split_points = []
+    for height_ratio in np.linspace(1.0, 0, 20):
+        y_level = bottom_y + sleeve_height * height_ratio
+        nearby_points = vertices[np.abs(vertices[:, 1] - y_level) < sleeve_height * 0.05]
+        if len(nearby_points) > 0:
+            x_center = nearby_points[:, 0].mean()
+            split_points.append([x_center, y_level])
+    
+    split_line = np.array(split_points)
+    
+    # Separate vertices into left (upper) and right (under) pieces
+    # Upper sleeve typically has the back/upper part
+    upper_vertices = []
+    under_vertices = []
+    
+    # Find vertices to the left and right of the split line
+    for v in vertices:
+        x, y = v
+        # Find closest point on split line
+        distances = np.sqrt((split_line[:, 0] - x)**2 + (split_line[:, 1] - y)**2)
+        closest_idx = distances.argmin()
+        split_x = split_line[closest_idx, 0]
+        
+        if x <= split_x:
+            upper_vertices.append(v)
+        else:
+            under_vertices.append(v)
+    
+    # Add split line to both pieces
+    upper_vertices.extend(split_line[::-1])  # Add split line in reverse
+    under_vertices.extend(split_line)  # Add split line
+    
+    pieces.append({
+        'name': 'Upper Sleeve',
+        'vertices': np.array(upper_vertices),
+        'description': 'Upper/back sleeve piece'
+    })
+    
+    pieces.append({
+        'name': 'Under Sleeve',
+        'vertices': np.array(under_vertices),
+        'description': 'Under/front sleeve piece'
+    })
+    
+    return pieces
+
+
+def _create_three_piece_sleeve(vertices, top_y, bottom_y, sleeve_height):
+    """
+    Create a three-piece sleeve: upper sleeve, under sleeve, and cuff piece.
+    This style is used in Chanel jackets and allows for better wrist shaping.
+    """
+    pieces = []
+    
+    # First split into upper and under like the two-piece
+    two_piece = _create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height)
+    
+    # Now split the lower portion (cuff area) from both pieces
+    # The cuff typically occupies the lower 20-25% of the sleeve
+    cuff_split_y = bottom_y + sleeve_height * 0.25
+    
+    for i, piece in enumerate(two_piece):
+        piece_vertices = piece['vertices']
+        
+        # Split this piece at the cuff line
+        upper_part = []
+        cuff_part = []
+        transition_points = []
+        
+        for v in piece_vertices:
+            if v[1] > cuff_split_y:
+                upper_part.append(v)
+            elif abs(v[1] - cuff_split_y) < sleeve_height * 0.02:
+                # Points near the split line go to both
+                transition_points.append(v)
+            else:
+                cuff_part.append(v)
+        
+        # Add transition points to both parts
+        upper_part.extend(transition_points)
+        cuff_part.extend(transition_points[::-1])
+        
+        if i == 0:  # Upper sleeve
+            pieces.append({
+                'name': 'Upper Sleeve (Back)',
+                'vertices': np.array(upper_part),
+                'description': 'Upper/back sleeve piece (top portion)'
+            })
+        else:  # Under sleeve
+            pieces.append({
+                'name': 'Under Sleeve (Front)',
+                'vertices': np.array(upper_part),
+                'description': 'Under/front sleeve piece (top portion)'
+            })
+    
+    # Combine cuff parts from both pieces into one cuff piece
+    # The cuff wraps around the wrist
+    all_cuff_points = []
+    for piece in two_piece:
+        piece_vertices = piece['vertices']
+        cuff_points = [v for v in piece_vertices if v[1] <= cuff_split_y + sleeve_height * 0.02]
+        all_cuff_points.extend(cuff_points)
+    
+    if all_cuff_points:
+        pieces.append({
+            'name': 'Cuff Piece',
+            'vertices': np.array(all_cuff_points),
+            'description': 'Cuff piece for wrist shaping (Chanel-style)'
+        })
+    
+    return pieces
+
+
+def draw_multi_piece_sleeve(pieces, title="Multi-Piece Sleeve Pattern"):
+    """
+    Draw multiple sleeve pieces on a single figure for visualization.
+    
+    Args:
+        pieces: List of piece dictionaries with 'name', 'vertices', and 'description'
+        title: Title for the plot
+    """
+    fig, ax = plt.subplots(figsize=(12, 10))
+    
+    colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8']
+    
+    for i, piece in enumerate(pieces):
+        vertices = piece['vertices']
+        if len(vertices) > 0:
+            color = colors[i % len(colors)]
+            
+            # Draw the piece outline
+            poly = Polygon(vertices, fill=False, edgecolor=color, 
+                          linewidth=2, linestyle='-', label=piece['name'])
+            ax.add_patch(poly)
+            
+            # Add piece label at the centroid
+            centroid = vertices.mean(axis=0)
+            ax.text(centroid[0], centroid[1], piece['name'], 
+                   fontsize=10, ha='center', va='center',
+                   bbox=dict(boxstyle='round', facecolor=color, alpha=0.3))
+            
+            # Add notches/marks at key points
+            if len(vertices) > 0:
+                # Mark the first point
+                ax.plot(vertices[0, 0], vertices[0, 1], 'ko', markersize=6)
+    
+    ax.set_aspect('equal')
+    ax.grid(True, alpha=0.3)
+    ax.legend(loc='upper right')
+    ax.set_title(title, fontsize=14, fontweight='bold')
+    ax.set_xlabel('Width (cm)', fontsize=10)
+    ax.set_ylabel('Length (cm)', fontsize=10)
+    
+    return fig, ax
+
+
+def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='output', 
+                   with_sleeves=False, sleeve_style=None, sleeve_pieces=1):
     """
     Generate a basic bodice pattern.
     
@@ -49,12 +253,15 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
         output_dir: Directory to save the PDF
         with_sleeves: Whether to add sleeves to the bodice
         sleeve_style: Sleeve style ('Gilewska', 'Chiappetta'), defaults to bodice style
+        sleeve_pieces: Number of pieces for sleeve (1=basic, 2=two-piece, 3=three-piece)
     """
     print(f"\nGenerating bodice pattern: {pname}")
     print(f"  Gender: {gender}")
     print(f"  Style: {style}")
     if with_sleeves:
         print(f"  With sleeves: {sleeve_style or style}")
+        if sleeve_pieces > 1:
+            print(f"  Sleeve pieces: {sleeve_pieces}")
     
     # Create the bodice pattern
     p = OP.Basic_Bodice(
@@ -70,21 +277,84 @@ def generate_bodice(pname="W36G", gender='w', style='Gilewska', output_dir='outp
     # Save as PDF
     os.makedirs(output_dir, exist_ok=True)
     sleeve_suffix = '_with_sleeves' if with_sleeves else ''
+    if sleeve_pieces > 1:
+        sleeve_suffix += f'_{sleeve_pieces}piece'
     pdf_path = os.path.join(output_dir, f'bodice_{pname}{sleeve_suffix}.pdf')
     
     if with_sleeves:
-        # Save multi-page PDF with bodice on page 1 and sleeves on page 2
+        # Save multi-page PDF with bodice and sleeves
         with PdfPages(pdf_path) as pdf:
             # Page 1: Bodice
             p.draw_bodice()
             pdf.savefig(plt.gcf(), bbox_inches='tight')
             plt.close()
             
-            # Page 2: Sleeves
-            p.draw_sleeves(save=False)
-            pdf.savefig(plt.gcf(), bbox_inches='tight')
-            plt.close()
-        print(f"  Saved: {pdf_path} (bodice on page 1, sleeves on page 2)")
+            if sleeve_pieces == 1:
+                # Page 2: Basic single-piece sleeves
+                p.draw_sleeves(save=False)
+                pdf.savefig(plt.gcf(), bbox_inches='tight')
+                plt.close()
+                print(f"  Saved: {pdf_path} (bodice on page 1, sleeves on page 2)")
+            else:
+                # Page 2: Original sleeve pattern for reference
+                p.draw_sleeves(save=False)
+                plt.title('Original Single-Piece Sleeve (Reference)', fontsize=12)
+                pdf.savefig(plt.gcf(), bbox_inches='tight')
+                plt.close()
+                
+                # Page 3+: Multi-piece sleeve patterns
+                try:
+                    sleeve_vertices = p.Sleeve_vertices
+                    pieces = split_sleeve_into_pieces(sleeve_vertices, num_pieces=sleeve_pieces)
+                    
+                    # Draw all pieces together for overview
+                    fig, ax = draw_multi_piece_sleeve(
+                        pieces, 
+                        title=f'{sleeve_pieces}-Piece Sleeve Pattern Overview'
+                    )
+                    pdf.savefig(fig, bbox_inches='tight')
+                    plt.close()
+                    
+                    # Draw each piece separately for printing
+                    for i, piece in enumerate(pieces, 1):
+                        fig, ax = plt.subplots(figsize=(10, 12))
+                        vertices = piece['vertices']
+                        
+                        if len(vertices) > 0:
+                            poly = Polygon(vertices, fill=False, edgecolor='black', 
+                                         linewidth=2, linestyle='-')
+                            ax.add_patch(poly)
+                            
+                            # Add notches at key points
+                            ax.plot(vertices[0, 0], vertices[0, 1], 'ko', markersize=8, 
+                                   label='Start point')
+                            
+                            # Add grainline indicator
+                            centroid = vertices.mean(axis=0)
+                            y_range = vertices[:, 1].max() - vertices[:, 1].min()
+                            grain_start = [centroid[0], centroid[1] - y_range * 0.3]
+                            grain_end = [centroid[0], centroid[1] + y_range * 0.3]
+                            ax.arrow(grain_start[0], grain_start[1], 
+                                   0, grain_end[1] - grain_start[1],
+                                   head_width=0.5, head_length=1, fc='blue', ec='blue',
+                                   label='Grainline')
+                        
+                        ax.set_aspect('equal')
+                        ax.grid(True, alpha=0.3)
+                        ax.legend(loc='upper right')
+                        ax.set_title(f'{piece["name"]}\n{piece["description"]}', 
+                                   fontsize=14, fontweight='bold')
+                        ax.set_xlabel('Width (cm)', fontsize=10)
+                        ax.set_ylabel('Length (cm)', fontsize=10)
+                        
+                        pdf.savefig(fig, bbox_inches='tight')
+                        plt.close()
+                    
+                    print(f"  Saved: {pdf_path} ({sleeve_pieces}-piece sleeve with {len(pieces)} pattern pieces)")
+                    
+                except Exception as e:
+                    print(f"  Warning: Could not create multi-piece sleeve: {e}")
+                    print(f"  Saved basic sleeve pattern instead")
     else:
         # Draw and save just the bodice
         p.draw()
@@ -335,6 +605,7 @@ def generate_from_json(json_file, output_dir='output'):
         # Check for sleeve transformation
         with_sleeves = transformations.get('add_sleeves', False)
         sleeve_style = transformations.get('sleeve_style', style)
+        sleeve_pieces = transformations.get('sleeve_pieces', 1)
         
         pdf_path = generate_bodice(
             pname=pname,
@@ -342,7 +613,8 @@ def generate_from_json(json_file, output_dir='output'):
             style=style,
             output_dir=output_dir,
             with_sleeves=with_sleeves,
-            sleeve_style=sleeve_style
+            sleeve_style=sleeve_style,
+            sleeve_pieces=sleeve_pieces
         )
     elif pattern_type == 'skirt':
         pname = ensure_pattern_suffix(name, 'skirt')
@@ -439,6 +711,14 @@ Examples:
         help='Sleeve style (defaults to bodice style)'
     )
     
+    parser.add_argument(
+        '--sleeve-pieces',
+        type=int,
+        choices=[1, 2, 3],
+        default=1,
+        help='Number of pieces for sleeve: 1=basic (default), 2=two-piece for better fit, 3=three-piece Chanel-style'
+    )
+    
     return parser.parse_args()
 
 
@@ -486,6 +766,7 @@ def main():
             # Check for sleeve transformation
             with_sleeves = args.add_sleeves
             sleeve_style = args.sleeve_style or style
+            sleeve_pieces = args.sleeve_pieces
             
             # Warn if sleeve options used without bodice
             if with_sleeves and pattern_type != 'bodice':
@@ -498,7 +779,8 @@ def main():
                 style=style,
                 output_dir=output_dir,
                 with_sleeves=with_sleeves,
-                sleeve_style=sleeve_style
+                sleeve_style=sleeve_style,
+                sleeve_pieces=sleeve_pieces
             )
         elif pattern_type == 'skirt':
             style = args.style or 'Chiappetta'
