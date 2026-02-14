@@ -24,24 +24,36 @@ Since OpenPattern doesn't have native two-piece or three-piece sleeve methods, w
 #### 1. Two-Piece Sleeve
 
 **Components:**
-- Upper Sleeve (back/outer piece)
-- Under Sleeve (front/inner piece)
+- Upper Sleeve (Oversleeve) - back/outer piece
+- Under Sleeve (Undersleeve) - front/inner piece
 
 **How it works:**
-- Splits the sleeve along a vertical centerline
-- The split follows the natural curve of the sleeve cap down to the cuff
-- Each piece includes seam allowance for joining
+- Splits the sleeve along the **elbow line** (not a simple vertical center)
+- The split runs from back-center of cap, through the elbow, to back-center of cuff
+- Split is biased toward the back: ~55-60% back, ~40-45% front
+- Upper sleeve is wider at the cap (for back of arm)
+- Under sleeve is narrower at cap, wider at forearm (for front of arm)
+- Follows proper tailoring standards for anatomical fit
+
+**Technical Details:**
+- Cap region: Split at 60% toward back edge
+- Mid/elbow region: Split at 55% toward back edge
+- Cuff region: Split at 50% (centered)
+- This creates proper sleeve drape and movement
 
 **Benefits:**
 - Better fit around the arm and elbow
+- Follows anatomical structure of the arm
 - Easier to achieve a tailored fit
 - Reduces strain on fabric
 - More professional appearance
+- Matches standard tailoring practices
 
 **Use cases:**
 - Tailored jackets and coats
 - Professional garments requiring precise fit
 - Patterns where arm mobility is important
+- Any garment where sleeve fit is critical
 
 #### 2. Three-Piece Sleeve (Chanel-Style)
 
@@ -142,10 +154,15 @@ python generate_patterns.py --type bodice --size W38G --gender w --style Gilewsk
 Main entry point that routes to appropriate splitting function based on `num_pieces`.
 
 #### `_create_two_piece_sleeve(vertices, top_y, bottom_y, sleeve_height)`
-- Analyzes sleeve vertices to find the approximate centerline
-- Splits vertices into left (upper) and right (under) groups
-- Adds split line to both pieces for proper seam matching
-- Returns list of piece definitions with vertices and metadata
+- Analyzes sleeve structure to identify front (narrower at cap) and back (wider at cap) edges
+- Determines which side is back based on cap width measurements
+- Creates offset split line following the **elbow line** from back-center of cap to back-center of cuff
+- Split bias varies by region:
+  - Cap: 60% toward back edge
+  - Mid/elbow: 55% toward back edge
+  - Cuff: 50% (centered)
+- Properly assigns vertices to upper (back) vs under (front) pieces
+- Returns list of piece definitions with anatomically correct proportions
 
 #### `_create_three_piece_sleeve(vertices, top_y, bottom_y, sleeve_height)`
 - Calls `_create_two_piece_sleeve()` first
@@ -162,28 +179,45 @@ Main entry point that routes to appropriate splitting function based on `num_pie
 
 ### Algorithm Details
 
-**Sleeve Splitting Process:**
+**Two-Piece Sleeve Splitting Process:**
 
 1. **Analyze Sleeve Geometry:**
    - Find top (cap) and bottom (cuff) of sleeve
    - Calculate sleeve height
-   - Identify center points at various heights
+   - Identify cap, mid (elbow), and cuff regions
+   - Measure width at cap to determine front vs back
 
-2. **Create Split Line:**
-   - Sample points along the vertical center of the sleeve
-   - Create smooth split line following natural curve
-   - Ensure split line extends from cap to cuff
+2. **Identify Front and Back:**
+   - Analyze cap region to find rightmost and leftmost extents
+   - Back side is typically wider at cap (extends further)
+   - Determine if back is on right or left side
 
-3. **Separate Vertices:**
-   - Classify each vertex as left or right of split line
-   - Maintain vertex order for proper polygon formation
-   - Add split line points to both pieces
+3. **Create Anatomical Split Line:**
+   - Split follows the **elbow line**, not vertical center
+   - Offset toward back: 55-60% back, 40-45% front
+   - Variable bias by region:
+     - Cap (top 30%): 60% toward back for proper back width
+     - Mid/elbow (30-70%): 55% toward back for natural drape
+     - Cuff (bottom 30%): 50% centered for symmetrical cuff
+   - Creates smooth curve from back of cap to back of cuff
 
-4. **For Three-Piece:**
+4. **Separate Vertices:**
+   - Classify each vertex as upper (back) or under (front)
+   - Uses nearest point on split line for classification
+   - Maintains vertex order for proper polygon formation
+   - Add split line points to both pieces for seam matching
+
+5. **For Three-Piece:**
+   - Apply two-piece split first
    - Identify cuff region (lower 20-25%)
    - Split both pieces at cuff line
    - Combine cuff portions into single piece
    - Maintain proper seam matching points
+
+**Key Principle:**
+A proper two-piece sleeve divides along anatomical lines, not geometric center. The split follows the natural curve from the back of the arm at the cap, through the elbow, to the back of the wrist. This creates:
+- Upper sleeve (oversleeve): Wider at cap, covers back of arm
+- Under sleeve (undersleeve): Narrower at cap, covers front of arm
 
 ## Testing
 

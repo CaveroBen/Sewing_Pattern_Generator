@@ -32,7 +32,12 @@ Transform a basic bodice pattern by adding fitted sleeves. The sleeves are autom
 #### Multi-Piece Sleeves
 
 **Two-Piece Sleeve:**
-- Upper sleeve (back) and under sleeve (front) pieces
+**Two-Piece Sleeve:**
+- Upper sleeve (oversleeve - back/outer) and under sleeve (undersleeve - front/inner)
+- Split follows the **elbow line** from back of cap through elbow to back of cuff
+- Upper sleeve is wider at cap (for back of arm)
+- Under sleeve is narrower at cap (for front of arm)
+- Proper anatomical fit following tailoring standards
 - Provides better fit and shaping around the arm
 - Easier to achieve a tailored fit
 - Suitable for most fitted garments
@@ -215,13 +220,18 @@ python generate_patterns.py --json test_three_piece_sleeve.json
 ### Multi-Piece Sleeve Algorithm
 
 **Two-Piece Sleeve:**
-- Splits sleeve along the vertical centerline
-- Creates upper sleeve (back/outer) and under sleeve (front/inner)
+- Splits sleeve along the **elbow line** (not vertical center)
+- Split runs from back-center of cap, through elbow, to back-center of cuff
+- Creates anatomically correct division:
+  - Upper sleeve (oversleeve): Wider at cap, covers back of arm
+  - Under sleeve (undersleeve): Narrower at cap, covers front of arm
+- Split is biased toward the back (55-60% back, 40-45% front)
 - Allows for better shaping around the elbow
 - Provides easier fitting adjustments
+- Follows proper tailoring standards
 
 **Three-Piece Sleeve:**
-- First splits into upper and under pieces (like two-piece)
+- First splits into upper and under pieces using proper two-piece method
 - Then separates the lower 20-25% to create a cuff piece
 - Cuff piece wraps around the wrist for precise shaping
 - Button placement can be positioned on top of wrist (Chanel technique)
