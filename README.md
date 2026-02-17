@@ -32,6 +32,51 @@ pip install git+https://github.com/fmetivier/OpenPattern.git
 
 ## Usage
 
+### Interactive Pattern Generator (Recommended)
+
+The interactive generator provides an easy-to-use interface for creating patterns with either standard sizes or bespoke measurements:
+
+```bash
+python interactive_generator.py
+```
+
+This will prompt you for:
+- Pattern type (bodice, skirt, trousers, shirt, waistcoat)
+- Size mode (standard or bespoke)
+- Size code (e.g., W36G, M44D) or JSON measurement file
+- Gender and style preferences
+- Output directory
+
+**All prompts include sensible defaults** - just press Enter to accept them.
+
+#### Command-Line Mode
+
+You can also use command-line arguments for automation:
+
+```bash
+# Generate with standard size
+python interactive_generator.py --pattern bodice --pname W36G --gender w --style Gilewska
+
+# Generate with bespoke measurements from JSON
+python interactive_generator.py --pattern shirt --bespoke measurements_shirt_example.json --gender m
+
+# See all options
+python interactive_generator.py --help
+```
+
+#### Bespoke Measurements
+
+Create custom patterns using JSON files to adjust parameters:
+
+1. Start with an example file (e.g., `measurements_shirt_example.json`)
+2. Modify parameters like ease, lengths, and fit preferences
+3. Generate your pattern:
+   ```bash
+   python interactive_generator.py --pattern shirt --bespoke my_measurements.json --gender m
+   ```
+
+See [MEASUREMENTS.md](MEASUREMENTS.md) for detailed documentation on creating measurement files.
+
 ### Generate All Pattern Types
 
 Run the main script to generate all pattern types (Bodice, Skirt, Trousers, Shirt, and Waistcoat):
