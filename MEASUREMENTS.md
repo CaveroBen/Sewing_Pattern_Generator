@@ -126,14 +126,55 @@ python interactive_generator.py
 
 ### Option 2: Full Body Measurements (Advanced - True Bespoke)
 
-For truly custom-fitted patterns, you can provide complete body measurements:
+For truly custom-fitted patterns, you can provide complete body measurements.
+
+#### Method 2a: Interactive English Input (RECOMMENDED)
+
+**NEW:** Use the interactive tool with English measurement names:
+
+```bash
+# Interactive mode - easiest for beginners
+python create_custom_measurements.py
+```
+
+The tool will:
+1. Ask you to select a base pattern size (e.g., W36G)
+2. Extract measurements from that size as defaults
+3. Prompt for each measurement with English names and descriptions
+   - Example: "Bust Circumference: Bust/chest circumference [Default: 84.00 cm]"
+4. Allow you to modify only the measurements you want
+5. Automatically convert to French names for OpenPattern
+6. Save as a ready-to-use JSON file
+
+**Features:**
+- All measurements use clear English names (bust_circumference, waist_circumference, etc.)
+- Comprehensive descriptions for each measurement
+- Base size provides defaults - just press Enter to keep them
+- Can skip entire categories if you don't need to modify them
+- Output file works directly with `interactive_generator.py`
+
+**Examples:**
+```bash
+# Interactive mode with prompts
+python create_custom_measurements.py
+
+# Non-interactive mode
+python create_custom_measurements.py --pname W36G --gender w --output my_size.json
+
+# Show measurement reference (English to French mapping)
+python create_custom_measurements.py --reference
+```
+
+#### Method 2b: Manual JSON Editing
+
+For advanced users who prefer to edit JSON directly:
 
 1. Extract a standard size template as a starting point:
    ```bash
    python extract_measurements.py --pname W36G --gender w --output my_measurements.json
    ```
 
-2. Edit the JSON file and modify the measurements in the `measurements` section:
+2. Edit the JSON file and modify the measurements in the `measurements` section (uses French names):
    ```json
    {
      "_metadata": {
@@ -202,9 +243,22 @@ Examples:
 
 ## Body Measurements Reference
 
-When using full body measurements (Option 2), here are the key measurements used:
+When using full body measurements (Option 2), here are the key measurements used.
 
-### Torso Measurements
+**Note:** The `create_custom_measurements.py` tool uses English names, which are automatically converted to French. For manual JSON editing, use the French names shown below.
+
+### English to French Quick Reference
+
+Use `python create_custom_measurements.py --reference` to see the complete mapping.
+
+Common measurements:
+- English: `bust_circumference` → French: `tour_poitrine`
+- English: `waist_circumference` → French: `tour_taille`
+- English: `hip_circumference` → French: `tour_bassin`
+- English: `back_length` → French: `longueur_dos`
+- English: `sleeve_length` → French: `longueur_manche`
+
+### Torso Measurements (French Names)
 - `tour_poitrine` - Bust/chest circumference
 - `tour_taille` - Waist circumference
 - `tour_bassin` - Hip circumference

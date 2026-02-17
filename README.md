@@ -76,11 +76,32 @@ Create custom patterns using JSON files in two ways:
 - Provide complete body measurements for truly bespoke patterns
 - All 35+ body measurements can be customized
 
+**NEW: Interactive English Input Tool**
+The easiest way to create custom measurements is with English input:
+
+```bash
+# Interactive tool with English measurement names
+python create_custom_measurements.py
+
+# Or non-interactive
+python create_custom_measurements.py --pname W36G --gender w --output my_size.json
+
+# See measurement reference (English to French mapping)
+python create_custom_measurements.py --reference
+```
+
+The tool will:
+1. Prompt you to select a base pattern size
+2. Use measurements from that size as defaults
+3. Ask for each measurement using clear English names (e.g., "bust_circumference")
+4. Convert to French names automatically for OpenPattern compatibility
+
+**Alternative: Manual JSON Creation**
 ```bash
 # Extract standard measurements as a template
 python extract_measurements.py --pname W36G --gender w --output my_size.json
 
-# Edit the measurements in the JSON file, then generate
+# Edit the measurements in the JSON file (uses French names), then generate
 python interactive_generator.py --pattern bodice --bespoke my_size.json --gender w
 ```
 
