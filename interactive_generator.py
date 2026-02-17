@@ -233,8 +233,13 @@ def generate_pattern_bespoke(pattern_type, measurements, gender, style, output_d
     Returns:
         str: Path to generated PDF
     """
-    # Extract pname or create a custom one
-    pname = measurements.get('pname', 'CUSTOM')
+    # Extract pname - it's required for bespoke measurements
+    if 'pname' not in measurements:
+        print("Error: JSON measurements file must include a 'pname' field with a valid size code.")
+        print("Example: \"pname\": \"W36G\" or \"pname\": \"M44G\"")
+        sys.exit(1)
+    
+    pname = measurements['pname']
     
     # Remove pname from measurements if present (to avoid duplication)
     params = {k: v for k, v in measurements.items() if k != 'pname'}
