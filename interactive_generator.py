@@ -147,6 +147,24 @@ def get_user_input(prompt, default, valid_options=None):
     return user_input
 
 
+def validate_waistcoat_gender(pattern_type, gender):
+    """
+    Validate and adjust gender for waistcoat patterns.
+    
+    Args:
+        pattern_type: The pattern type being generated
+        gender: The requested gender code
+        
+    Returns:
+        str: The validated/adjusted gender code
+    """
+    if pattern_type == 'waistcoat' and gender == 'w':
+        print("\nWarning: Waistcoat patterns only support men's sizes.")
+        print("Changing gender to 'm' (men)...")
+        return 'm'
+    return gender
+
+
 def generate_pattern_standard(pattern_type, pname, gender, style, output_dir, **extra_params):
     """
     Generate a pattern using standard size.
@@ -306,12 +324,7 @@ def interactive_mode():
         
         # Get gender and style
         gender = get_user_input("Gender", 'w', ['w', 'm'])
-        
-        # Validate gender for waistcoat
-        if pattern_type == 'waistcoat' and gender == 'w':
-            print("\nWarning: Waistcoat patterns only support men's sizes.")
-            print("Changing gender to 'm' (men)...")
-            gender = 'm'
+        gender = validate_waistcoat_gender(pattern_type, gender)
         
         # Get available styles for this pattern type
         styles = PATTERN_TYPES[pattern_type]['styles']
@@ -338,12 +351,7 @@ def interactive_mode():
             default_gender = 'w'
         
         gender = get_user_input("Gender", default_gender, ['w', 'm'])
-        
-        # Validate gender for waistcoat
-        if pattern_type == 'waistcoat' and gender == 'w':
-            print("\nWarning: Waistcoat patterns only support men's sizes.")
-            print("Changing gender to 'm' (men)...")
-            gender = 'm'
+        gender = validate_waistcoat_gender(pattern_type, gender)
         
         # Get available styles for this pattern type
         styles = PATTERN_TYPES[pattern_type]['styles']
