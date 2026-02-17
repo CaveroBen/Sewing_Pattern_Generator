@@ -165,6 +165,17 @@ def generate_pattern_standard(pattern_type, pname, gender, style, output_dir, **
     config = PATTERN_TYPES[pattern_type]
     pattern_class = config['class']
     
+    # Validate gender compatibility for specific pattern types
+    if pattern_type == 'waistcoat' and gender == 'w':
+        print("\n" + "="*60)
+        print("ERROR: Women's waistcoat patterns are not supported")
+        print("="*60)
+        print("The OpenPattern library's Waist_Coat class currently only")
+        print("supports men's sizes. Please use a men's size code (e.g., M44G)")
+        print("or choose a different pattern type.")
+        print("="*60)
+        sys.exit(1)
+    
     # Use special gender code if required (e.g., skirt uses 'G')
     if 'special_gender' in config:
         gender = config['special_gender']
@@ -296,6 +307,12 @@ def interactive_mode():
         # Get gender and style
         gender = get_user_input("Gender", 'w', ['w', 'm'])
         
+        # Validate gender for waistcoat
+        if pattern_type == 'waistcoat' and gender == 'w':
+            print("\nWarning: Waistcoat patterns only support men's sizes.")
+            print("Changing gender to 'm' (men)...")
+            gender = 'm'
+        
         # Get available styles for this pattern type
         styles = PATTERN_TYPES[pattern_type]['styles']
         style = get_user_input("Style", styles[0], styles)
@@ -321,6 +338,12 @@ def interactive_mode():
             default_gender = 'w'
         
         gender = get_user_input("Gender", default_gender, ['w', 'm'])
+        
+        # Validate gender for waistcoat
+        if pattern_type == 'waistcoat' and gender == 'w':
+            print("\nWarning: Waistcoat patterns only support men's sizes.")
+            print("Changing gender to 'm' (men)...")
+            gender = 'm'
         
         # Get available styles for this pattern type
         styles = PATTERN_TYPES[pattern_type]['styles']

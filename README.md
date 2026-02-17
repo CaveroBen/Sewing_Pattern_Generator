@@ -169,6 +169,7 @@ plt.show()
 - **Style**: Gilewska
 - **Parameters**: pname, gender, style
 - **Example**: `OP.Waist_Coat(pname="M44G", gender='m', style='Gilewska')`
+- **Note**: Currently only supports men's sizes (OpenPattern limitation)
 
 ## Pattern Naming Convention
 
@@ -199,8 +200,8 @@ trousers = OP.Basic_Trousers(pname="W38D", gender='w', style='Donnanno', darts=T
 # Men's shirt
 shirt = OP.Shirt(pname="M44G", gender='m', style='Gilewska')
 
-# Women's waistcoat
-waistcoat = OP.Waist_Coat(pname="W40G", gender='w', style='Gilewska')
+# Men's waistcoat (note: only men's sizes are supported)
+waistcoat = OP.Waist_Coat(pname="M44G", gender='m', style='Gilewska')
 ```
 
 ## Output

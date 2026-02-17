@@ -65,7 +65,7 @@ Parameters:
 - `button_overlap`: Button overlap width in cm (default: 2)
 
 ### measurements_waistcoat_example.json
-Waistcoat pattern with custom style:
+Waistcoat pattern with custom style (men's sizes only):
 ```json
 {
   "pname": "M44G",
@@ -80,6 +80,8 @@ Parameters:
 - `ease`: Extra room in cm (default: 8)
 - `wc_style`: Waistcoat style - "Classical" or other options (default: "Classical")
 - `overlap`: Whether fronts overlap (default: false)
+
+**Note**: Waistcoat patterns currently only support men's sizes due to OpenPattern library limitations.
 
 ## Usage
 
