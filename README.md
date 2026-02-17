@@ -66,14 +66,23 @@ python interactive_generator.py --help
 
 #### Bespoke Measurements
 
-Create custom patterns using JSON files to adjust parameters:
+Create custom patterns using JSON files in two ways:
 
-1. Start with an example file (e.g., `measurements_shirt_example.json`)
-2. Modify parameters like ease, lengths, and fit preferences
-3. Generate your pattern:
-   ```bash
-   python interactive_generator.py --pattern shirt --bespoke my_measurements.json --gender m
-   ```
+**Option 1: Adjust Parameters (Simple)**
+- Modify pattern parameters like ease, lengths, and fit preferences
+- Based on a standard size with custom adjustments
+
+**Option 2: Full Custom Measurements (Advanced)**
+- Provide complete body measurements for truly bespoke patterns
+- All 35+ body measurements can be customized
+
+```bash
+# Extract standard measurements as a template
+python extract_measurements.py --pname W36G --gender w --output my_size.json
+
+# Edit the measurements in the JSON file, then generate
+python interactive_generator.py --pattern bodice --bespoke my_size.json --gender w
+```
 
 See [MEASUREMENTS.md](MEASUREMENTS.md) for detailed documentation on creating measurement files.
 

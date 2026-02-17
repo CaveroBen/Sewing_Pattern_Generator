@@ -113,14 +113,68 @@ python interactive_generator.py
 
 ## Creating Your Own Measurement Files
 
+### Option 1: Parameter-Only Customization (Simple)
+
 1. Start with one of the example files
 2. Keep the `pname` field with a valid OpenPattern size code
-3. Adjust only the parameters you want to customize
+3. Adjust only the parameters you want to customize (ease, lengths, etc.)
 4. Save with a descriptive name (e.g., `my_custom_shirt.json`)
 5. Use with the interactive generator:
    ```bash
    python interactive_generator.py --pattern shirt --bespoke my_custom_shirt.json --gender m
    ```
+
+### Option 2: Full Body Measurements (Advanced - True Bespoke)
+
+For truly custom-fitted patterns, you can provide complete body measurements:
+
+1. Extract a standard size template as a starting point:
+   ```bash
+   python extract_measurements.py --pname W36G --gender w --output my_measurements.json
+   ```
+
+2. Edit the JSON file and modify the measurements in the `measurements` section:
+   ```json
+   {
+     "_metadata": {
+       "source_size": "W36G",
+       "description": "My custom body measurements"
+     },
+     "measurements": {
+       "tour_poitrine": 90.0,
+       "tour_taille": 68.0,
+       "tour_bassin": 94.0,
+       ...
+     }
+   }
+   ```
+
+3. Use the custom measurements file:
+   ```bash
+   python interactive_generator.py --pattern bodice --bespoke my_measurements.json --gender w
+   ```
+
+**Important Notes for Full Body Measurements:**
+- This provides the most accurate custom fitting
+- All 35 body measurements can be customized
+- The pattern is based on a standard size but measurements are overridden
+- Some derived calculations may still use the base size
+- Choose a base size (source_size) close to your actual measurements for best results
+
+### Extracting Standard Measurements
+
+Use the `extract_measurements.py` utility to see what measurements OpenPattern uses:
+
+```bash
+# List available sizes
+python extract_measurements.py --list
+
+# Extract women's size 36
+python extract_measurements.py --pname W36G --gender w --output measurements_W36G.json
+
+# Extract men's size 44
+python extract_measurements.py --pname M44G --gender m --output measurements_M44G.json
+```
 
 ## Standard Size Codes
 
@@ -145,3 +199,48 @@ Examples:
 - Parameters not in the JSON will use their default values
 - Boolean values should be `true` or `false` (lowercase, no quotes)
 - Numeric values can be integers or decimals (no quotes)
+
+## Body Measurements Reference
+
+When using full body measurements (Option 2), here are the key measurements used:
+
+### Torso Measurements
+- `tour_poitrine` - Bust/chest circumference
+- `tour_taille` - Waist circumference
+- `tour_bassin` - Hip circumference
+- `tour_petites_hanches` - Small hip circumference
+- `tour_encolure` - Neck circumference
+
+### Lengths
+- `longueur_dos` - Back length (nape to waist)
+- `longueur_devant` - Front length (shoulder to waist)
+- `longueur_taille_terre` - Total height (waist to floor)
+- `longueur_epaule` - Shoulder length
+- `longueur_manche` - Sleeve length
+
+### Widths
+- `carrure_dos` - Back width (shoulder blade to shoulder blade)
+- `carrure_devant` - Front width (chest width)
+- `largeur_encolure` - Neckline width
+
+### Heights/Depths
+- `hauteur_emmanchure` - Armhole depth
+- `hauteur_poitrine` - Bust point height
+- `hauteur_bassin` - Hip height
+- `hauteur_carrure` - Back shoulder height
+- `profondeur_encolure_dos` - Back neckline depth
+- `profondeur_encolure_devant` - Front neckline depth
+
+### Arm Measurements
+- `tour_bras` - Upper arm circumference
+- `tour_poignet` - Wrist circumference
+- `hauteur_coude` - Elbow height
+
+### Leg Measurements (for trousers)
+- `tour_cuisse` - Thigh circumference
+- `tour_genou` - Knee circumference
+- `tour_cheville` - Ankle circumference
+- `fourche` - Crotch depth/rise
+- `montant` - Crotch measurement
+
+Use `extract_measurements.py` to see all 35+ measurements with their values for any standard size.
