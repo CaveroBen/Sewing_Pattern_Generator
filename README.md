@@ -1,6 +1,6 @@
 # Sewing Pattern Generator
 
-A simple Python interface to the OpenPattern library for generating professional sewing patterns. This tool creates standard patterns (Bodice, Skirt, and Trousers) and exports them as PDF files.
+A simple Python interface to the OpenPattern library for generating professional sewing patterns. This tool creates standard patterns (Bodice, Skirt, Trousers, Shirt, and Waistcoat) and exports them as PDF files.
 
 ## About OpenPattern
 
@@ -34,16 +34,18 @@ pip install git+https://github.com/fmetivier/OpenPattern.git
 
 ### Generate All Pattern Types
 
-Run the main script to generate all three pattern types (Bodice, Skirt, and Trousers):
+Run the main script to generate all pattern types (Bodice, Skirt, Trousers, Shirt, and Waistcoat):
 
 ```bash
 python generate_patterns.py
 ```
 
-This will create three PDF files in the `output/` directory:
+This will create PDF files in the `output/` directory:
 - `bodice_W36G.pdf` - Women's bodice (Gilewska style)
 - `skirt_W6C.pdf` - Women's skirt (Chiappetta style)
 - `Donnanno_Basic_Trousers_M44D_FullSize.pdf` - Men's trousers (Donnanno style)
+- `shirt_M44G.pdf` - Men's shirt (Gilewska style)
+- `waistcoat_M44G.pdf` - Men's waistcoat (Gilewska style)
 
 ### Individual Pattern Examples
 
@@ -62,6 +64,16 @@ python examples/skirt_example.py
 #### Generate a Trousers Pattern
 ```bash
 python examples/trousers_example.py
+```
+
+#### Generate a Shirt Pattern
+```bash
+python examples/shirt_example.py
+```
+
+#### Generate a Waistcoat Pattern
+```bash
+python examples/waistcoat_example.py
 ```
 
 ### Use in Your Own Code
@@ -103,6 +115,16 @@ plt.show()
 - **Parameters**: pname, gender, style, darts
 - **Example**: `OP.Basic_Trousers(pname="M44D", gender='m', style='Donnanno', darts=True)`
 
+### Shirt
+- **Style**: Gilewska
+- **Parameters**: pname, gender, style
+- **Example**: `OP.Shirt(pname="M44G", gender='m', style='Gilewska')`
+
+### Waistcoat
+- **Style**: Gilewska
+- **Parameters**: pname, gender, style
+- **Example**: `OP.Waist_Coat(pname="M44G", gender='m', style='Gilewska')`
+
 ## Pattern Naming Convention
 
 Pattern names follow the OpenPattern convention:
@@ -128,6 +150,12 @@ p = OP.Basic_Skirt(pname="W6C", gender='G', style='Chiappetta', ease=10, curves=
 
 # Women's trousers
 trousers = OP.Basic_Trousers(pname="W38D", gender='w', style='Donnanno', darts=True)
+
+# Men's shirt
+shirt = OP.Shirt(pname="M44G", gender='m', style='Gilewska')
+
+# Women's waistcoat
+waistcoat = OP.Waist_Coat(pname="W40G", gender='w', style='Gilewska')
 ```
 
 ## Output
@@ -149,6 +177,8 @@ The `examples/` directory contains individual scripts for each pattern type:
 - `bodice_example.py` - Basic bodice pattern
 - `skirt_example.py` - Basic skirt pattern
 - `trousers_example.py` - Basic trousers pattern
+- `shirt_example.py` - Shirt pattern
+- `waistcoat_example.py` - Waistcoat (vest) pattern
 
 See the [examples/README.md](examples/README.md) for more details.
 

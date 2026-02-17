@@ -6,6 +6,8 @@ This script generates standard sewing patterns using OpenPattern library:
 - Basic Bodice (Gilewska style)
 - Basic Skirt (Chiappetta style)  
 - Basic Trousers (Donnanno style)
+- Shirt (Gilewska style)
+- Waistcoat (Gilewska style)
 
 All patterns are exported as PDF files.
 """
@@ -139,6 +141,74 @@ def generate_trousers(pname="M44D", gender='m', style='Donnanno', darts=True, ou
     return pdf_path
 
 
+def generate_shirt(pname="M44G", gender='m', style='Gilewska', output_dir='output'):
+    """
+    Generate a shirt pattern.
+    
+    Args:
+        pname: Pattern name (e.g., M44G = Men's size 44, Gilewska style)
+        gender: 'w' for women, 'm' for men
+        style: Pattern drafting style (e.g., 'Gilewska')
+        output_dir: Directory to save the PDF
+    """
+    print(f"\nGenerating shirt pattern: {pname}")
+    print(f"  Gender: {gender}")
+    print(f"  Style: {style}")
+    
+    # Create the shirt pattern
+    shirt = OP.Shirt(
+        pname=pname,
+        gender=gender,
+        style=style
+    )
+    
+    # Draw the pattern
+    shirt.draw()
+    
+    # Save as PDF
+    os.makedirs(output_dir, exist_ok=True)
+    pdf_path = os.path.join(output_dir, f'shirt_{pname}.pdf')
+    plt.savefig(pdf_path, format='pdf', bbox_inches='tight')
+    print(f"  Saved: {pdf_path}")
+    
+    plt.close()
+    return pdf_path
+
+
+def generate_waistcoat(pname="M44G", gender='m', style='Gilewska', output_dir='output'):
+    """
+    Generate a waistcoat pattern.
+    
+    Args:
+        pname: Pattern name (e.g., M44G = Men's size 44, Gilewska style)
+        gender: 'w' for women, 'm' for men
+        style: Pattern drafting style (e.g., 'Gilewska')
+        output_dir: Directory to save the PDF
+    """
+    print(f"\nGenerating waistcoat pattern: {pname}")
+    print(f"  Gender: {gender}")
+    print(f"  Style: {style}")
+    
+    # Create the waistcoat pattern
+    waistcoat = OP.Waist_Coat(
+        pname=pname,
+        gender=gender,
+        style=style
+    )
+    
+    # Draw the pattern
+    waistcoat.draw()
+    
+    # Save as PDF
+    os.makedirs(output_dir, exist_ok=True)
+    pdf_path = os.path.join(output_dir, f'waistcoat_{pname}.pdf')
+    plt.savefig(pdf_path, format='pdf', bbox_inches='tight')
+    print(f"  Saved: {pdf_path}")
+    
+    plt.close()
+    return pdf_path
+
+
 def main():
     """Main function to generate all pattern types."""
     print("=" * 60)
@@ -169,6 +239,20 @@ def main():
         gender='m',
         style='Donnanno',
         darts=True,
+        output_dir=output_dir
+    )
+    
+    shirt_pdf = generate_shirt(
+        pname="M44G",
+        gender='m',
+        style='Gilewska',
+        output_dir=output_dir
+    )
+    
+    waistcoat_pdf = generate_waistcoat(
+        pname="M44G",
+        gender='m',
+        style='Gilewska',
         output_dir=output_dir
     )
     
